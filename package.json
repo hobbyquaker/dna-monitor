@@ -1,6 +1,7 @@
 {
   "name": "dna-monitor",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "private": true,
   "description": "A simple macOS device monitoring tool for e-cigarettes with Evolv DNA chipset",
   "main": "main.js",
   "scripts": {

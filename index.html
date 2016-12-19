@@ -8,8 +8,13 @@
   </head>
   <body>
     <div id="chart"></div>
-    <label for="psp">Power</label><input id="psp" type="number"><input id="setp" type="button" value="set">
-    <label for="tsp">Temperature</label><input id="tsp" type="number"><input id="sett" type="button" value="set">
+    <label for="psp">Power</label><input id="psp" type="number"> W <input id="setp" type="button" value="set">
+    <label for="tsp">Temperature</label><input id="tsp" type="number">°
+    <select id="degreeunit">
+        <option value="C">C</option>
+        <option value="F">F</option>
+    </select>
+    <input id="sett" type="button" value="set">
   </body>
 
   <script>
@@ -18,24 +23,45 @@
     var ipc = require('electron').ipcRenderer;
 
     var running;
+    var degreeunit;
     var start;
     ipc.on('values', function (event, data) {
-      if (data.p.match(/W/)) {
-        if (!running) {
-          chart.series[0].setData([]);
-          chart.series[1].setData([]);
-          chart.redraw();
-           start = (new Date()).getTime();
-          running = true;
-        }
+        if (data.p.match(/W/)) {
+            if (!running) {
+                chart.series[0].setData([]);
+                chart.series[1].setData([]);
+                chart.redraw();
+                start = (new Date()).getTime();
+                running = true;
+            }
 
-        var t = parseFloat(data.t.replace('C', ''));
-        var p = parseFloat(data.p.replace('W', ''));
-        var elapsed = ((new Date()).getTime() - start) / 1000;
-          chart.series[0].addPoint([elapsed, t], true, false, false);
-          chart.series[1].addPoint([elapsed, p], true, false, false);
+            if (running && !degreeunit && data.t.match(/C/)) {
+                chart.yAxis[0].update({
+                    labels: {
+                        format: '{value}°C'
+                    }
+                });
+                $('#degreeunit').val('C');
+                degreeunit = true;
+
+            } else if (running && !degreeunit && data.t.match(/F/)) {
+                chart.yAxis[0].update({
+                    labels: {
+                        format: '{value}°F'
+                    }
+                });
+                $('#degreeunit').val('F');
+                degreeunit = true;
+            }
+
+            var t = parseFloat(data.t.replace('C', ''));
+            var p = parseFloat(data.p.replace('W', ''));
+            var elapsed = ((new Date()).getTime() - start) / 1000;
+            chart.series[0].addPoint([elapsed, t], true, false, false);
+            chart.series[1].addPoint([elapsed, p], true, false, false);
       } else {
         running = false;
+        degreeunit = false;
       }
     });
 
@@ -51,9 +77,9 @@
         ipc.send('setp', $('#psp').val());
     });
     $('#sett').click(function () {
-        ipc.send('sett', $('#tsp').val());
+        var val = $('#tsp').val() + $('#degreeunit').val();
+        ipc.send('sett', val);
     });
-
 
     require('highcharts/themes/gray.js')(Highcharts)
 

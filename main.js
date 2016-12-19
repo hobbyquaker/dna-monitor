@@ -23,7 +23,7 @@ function createWindow () {
   }));
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -152,5 +152,5 @@ ipc.on('setp', function (e, val) {
 });
 
 ipc.on('sett', function (e, val) {
-  port.write('T=' + val + 'C\n');
+  port.write('T=' + val + '\n');
 });
