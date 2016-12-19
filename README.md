@@ -16,13 +16,13 @@ progress.
 
 ### Usage
 
-Connect your DNA Device to your Mac, wait a moment, start the Application.
+Connect your DNA Device to your Mac, start the Application, vape on.
 
 
 ### Todo
 
 * [x] Support Degree Farenheit
-* [ ] Catch errors (no serialport available, ...)
+* [x] Catch errors if no serialport available
 * [ ] Show more values: Battery Voltage
 * [ ] Show more values: Coil Voltage
 * [ ] Show more values: Current
@@ -32,6 +32,7 @@ Connect your DNA Device to your Mac, wait a moment, start the Application.
 * [ ] Show current profile
 * [ ] Change current profile
 * [ ] Hit fire button
+* [ ] Linux support
 
 
 ### License
