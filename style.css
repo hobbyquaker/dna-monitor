@@ -2,15 +2,35 @@ body {
     padding: 0;
     margin: 0;
     background-color: #111;
-    color: #eee;
-    font-family: sans-serif;
+
 }
 
-label {
+.unit, .label {
+    color: #eee;
+}
+
+.label {
     padding-left: 50px;
     padding-right: 6px;
 }
 
 #psp, #tsp {
     width: 60px;
+}
+
+#degreeunit {
+    width: 42px;
+    display: inline-block;
+}
+
+.form-control {
+    height: 30px;
+}
+
+.btn {
+    margin-top: -1px;
+}
+
+#controls {
+    padding-top: 4px;
 }

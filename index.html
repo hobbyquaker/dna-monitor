@@ -3,23 +3,30 @@
   <head>
     <meta charset="UTF-8">
     <title>DNA Monitor</title>
+    <link rel="stylesheet" href="node_modules/photonkit/dist/css/photon.css">
     <link rel="stylesheet" href="style.css">
 
   </head>
   <body>
     <div id="chart"></div>
-    <label for="psp">Power</label><input id="psp" type="number"> W <input id="setp" type="button" value="set">
-    <label for="tsp">Temperature</label><input id="tsp" type="number">°
-    <select id="degreeunit">
-        <option value="C">C</option>
-        <option value="F">F</option>
-    </select>
-    <input id="sett" type="button" value="set">
+    <div id="controls">
+        <span class="label">Power</span><input class="form-control" id="psp" type="number"> <span class="unit">W</span>
+        <input class="btn btn-large btn-default" id="setp" type="button" value="set">
+        <spann class="label">Temperature</spann><input class="form-control" id="tsp" type="number">
+        <select class="form-control" id="degreeunit">
+            <option value="C">°C</option>
+            <option value="F">°F</option>
+        </select>
+        <input class="btn btn-large btn-default" id="sett" type="button" value="set">
+    </div>
   </body>
 
   <script>
     // You can also require other files to run in this process
-    require('./renderer.js')
+    require('./renderer.js');
+
+
+
     var ipc = require('electron').ipcRenderer;
 
     var running;
