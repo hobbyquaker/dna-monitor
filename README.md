@@ -23,6 +23,7 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 
 * [x] Support Degree Farenheit
 * [x] Catch errors if no serialport available
+* [ ] Vertical resize of chart on window resizing
 * [ ] Show more values: Battery Voltage
 * [ ] Show more values: Coil Voltage
 * [ ] Show more values: Current
