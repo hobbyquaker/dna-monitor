@@ -1,0 +1,29 @@
+{
+  "name": "dna-monitor",
+  "version": "0.0.1",
+  "description": "A simple macOS device monitoring tool for e-cigarettes with Evolv DNA chipset",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/hobbyquaker/electron-quick-start",
+  "keywords": [
+    "vape",
+    "e-cigarette",
+    "evolv",
+    "dna",
+    "device",
+    "monitor"
+  ],
+  "author": "GitHub",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^1.4.1",
+    "electron-packager": "^8.4.0"
+  },
+  "dependencies": {
+    "highcharts": "^5.0.6",
+    "jquery": "^3.1.1",
+    "serialport": "^4.0.7"
+  }
+}

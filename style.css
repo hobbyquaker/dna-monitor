@@ -1,0 +1,16 @@
+body {
+    padding: 0;
+    margin: 0;
+    background-color: #111;
+    color: #eee;
+    font-family: sans-serif;
+}
+
+label {
+    padding-left: 50px;
+    padding-right: 6px;
+}
+
+#psp, #tsp {
+    width: 60px;
+}
