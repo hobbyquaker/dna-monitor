@@ -1,39 +1,47 @@
-const electron = require('electron')
+const electron = require('electron');
 // Module to control application life.
-const app = electron.app
+const app = electron.app;
 // Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
+const BrowserWindow = electron.BrowserWindow;
 
-const path = require('path')
-const url = require('url')
+const path = require('path');
+const url = require('url');
+const fs = require('fs');
+const SerialPort = require('serialport');
+const ipc = require('electron').ipcMain;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow;
 
 function createWindow () {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 480})
+    // Create the browser window.
+    mainWindow = new BrowserWindow({width: 800, height: 480});
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
-    protocol: 'file:',
-    slashes: true
-  }));
+    // and load the index.html of the app.
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
 
-  // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+    // Open the DevTools.
+    //mainWindow.webContents.openDevTools();
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-    port.close();
-    process.exit(0);
-  })
+    // let's go!
+    setTimeout(function () {
+        findport(start);
+    }, 1000);
+
+    // Emitted when the window is closed.
+    mainWindow.on('closed', function () {
+        // Dereference the window object, usually you would store windows
+        // in an array if your app supports multi windows, this is the time
+        // when you should delete the corresponding element.
+        mainWindow = null;
+        port.close();
+        process.exit(0);
+    });
 }
 
 // This method will be called when Electron has finished
@@ -43,114 +51,122 @@ app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-    app.quit()
-
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    app.quit();
 });
 
 app.on('activate', function () {
-  if (mainWindow === null) {
-    createWindow()
-  }
+    if (mainWindow === null) {
+        createWindow();
+    }
 });
 
-var fs = require('fs');
 
-var devs = (fs.readdirSync('/dev'));
-var sport;
-for (var i = 0; i < devs.length; i++) {
-  if (devs[i].match(/tty\.usbmodem[0-9A-Z]+/)) {
-    sport = '/dev/' + devs[i];
-    break;
-  }
-}
-
-var SerialPort = require('serialport');
-var port = new SerialPort(sport);
-
-var connected = false;
+var port = null;
 var callbacks = {};
 
-port.on('open', function () {
-  connected = true;
-  poll();
+function findport(cb) {
+    var devs = (fs.readdirSync('/dev'));
+    var sport;
+    for (var i = 0; i < devs.length; i++) {
+        if (devs[i].match(/tty\.usbmodem[0-9A-Z]+/)) {
+            sport = '/dev/' + devs[i];
+            break;
+        }
+    }
+    if (sport) {
+        cb(sport)
+    } else {
+        setTimeout(function () {
+            findport(cb);
+        }, 1000);
+    }
+}
 
-});
 
-port.on('close', () => {
-  connected = false;
-});
+function start(sport) {
+    port = new SerialPort(sport);
 
-// open errors will be emitted as an error event
-port.on('error', function(err) {
-  console.log('Error: ', err.message);
-});
+    port.on('open', function () {
+        mainWindow.webContents.send('sport', true);
+        setTimeout(poll, 1000);
 
-port.on('data', function (data) {
-  var [datapoint, value] = data.toString().replace(/\n$/, '').split('=');
-  if (callbacks[datapoint]) {
-    let cb = callbacks[datapoint];
-    delete callbacks[datapoint];
-    cb(null, value);
-  } else if (callbacks[datapoint + 'SP']) {
-    let cb = callbacks[datapoint + 'SP'];
-    delete callbacks[datapoint];
-    cb(null, value);
-  }
-});
+    });
+
+    port.on('disconnect', () => {
+        mainWindow.webContents.send('sport', false);
+        port = null;
+        findport(start);
+    });
+
+    port.on('data', function (data) {
+        var [datapoint, value] = data.toString().replace(/\n$/, '').split('=');
+        if (callbacks[datapoint]) {
+            let cb = callbacks[datapoint];
+            delete callbacks[datapoint];
+            cb(null, value);
+        } else if (callbacks[datapoint + 'SP']) {
+            let cb = callbacks[datapoint + 'SP'];
+            delete callbacks[datapoint];
+            cb(null, value);
+        }
+    });
+}
 
 function getValue(val, cb) {
-  port.write(val + '=GET\n', function (err) {
-    if (err) {
-      cb(err.message);
-    } else {
-      callbacks[val] = cb;
-    }
-  });
+    port.write(val + '=GET\n', function (err) {
+        if (err) {
+            cb(err.message);
+        } else {
+            callbacks[val] = cb;
+        }
+    });
 }
 
 function getSP(val, cb) {
-  port.write(val + '=GET SP\n', function (err) {
-    if (err) {
-      cb(err.message);
-    } else {
-      callbacks[val + 'SP'] = cb;
-    }
-  });
+    port.write(val + '=GET SP\n', function (err) {
+        if (err) {
+            cb(err.message);
+        } else {
+            callbacks[val + 'SP'] = cb;
+        }
+    });
 }
-
-var ipc = require('electron').ipcMain;
 
 var pc = 0;
 
 function poll() {
-  getValue('T', (err, t) => {
-    getValue('P', (err, p) => {
-        if (!mainWindow) process.exit(0);
-        mainWindow.webContents.send('values', {t:t, p:p});
-        pc++;
-        if (pc > 50 && p.match(/W/)) {
-          pc = 0;
-            getSP('T', (err, tsp) => {
-              getSP('P', (err, psp) => {
-                if (!mainWindow) process.exit(0);
-                mainWindow.webContents.send('setpoints', {t:tsp, p:psp});
-                setTimeout(poll, 20);
-              });
-            });
-        } else {
-          setTimeout(poll, 20);
-        }
-
+    if (!port) return;
+    getValue('T', (err, t) => {
+        if (!port) return;
+        getValue('P', (err, p) => {
+            if (!port) return;
+            if (!mainWindow) process.exit(0);
+            mainWindow.webContents.send('values', {t:t, p:p});
+            pc++;
+            if (pc > 50 && p.match(/W/)) {
+                pc = 0;
+                getSP('T', (err, tsp) => {
+                    if (!port) return;
+                    getSP('P', (err, psp) => {
+                        if (!port) return;
+                        if (!mainWindow) process.exit(0);
+                        mainWindow.webContents.send('setpoints', {t:tsp, p:psp});
+                        setTimeout(poll, 20);
+                    });
+                });
+            } else {
+              setTimeout(poll, 20);
+            }
+        });
     });
-  });
 }
 
 ipc.on('setp', function (e, val) {
-  port.write('P=' + val + 'W\n');
+    port.write('P=' + val + 'W\n');
 });
 
 ipc.on('sett', function (e, val) {
-  port.write('T=' + val + '\n');
+    port.write('T=' + val + '\n');
 });

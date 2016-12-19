@@ -5,14 +5,16 @@
     <title>DNA Monitor</title>
     <link rel="stylesheet" href="node_modules/photonkit/dist/css/photon.css">
     <link rel="stylesheet" href="style.css">
-
   </head>
   <body>
+    <div id="error">
+        Searching for DNA device...
+    </div>
     <div id="chart"></div>
     <div id="controls">
         <span class="label">Power</span><input class="form-control" id="psp" type="number"> <span class="unit">W</span>
         <input class="btn btn-large btn-default" id="setp" type="button" value="set">
-        <spann class="label">Temperature</spann><input class="form-control" id="tsp" type="number">
+        <span class="label">Temperature</span><input class="form-control" id="tsp" type="number">
         <select class="form-control" id="degreeunit">
             <option value="C">°C</option>
             <option value="F">°F</option>
@@ -22,12 +24,26 @@
   </body>
 
   <script>
-    // You can also require other files to run in this process
     require('./renderer.js');
 
+    const ipc = require('electron').ipcRenderer;
+    const $ = jQuery = require('jquery')
+    const Highcharts = require('highcharts')
+    require('highcharts/themes/gray.js')(Highcharts);
 
 
-    var ipc = require('electron').ipcRenderer;
+    ipc.on('sport', function (event, data) {
+        if (data) {
+            $('#error').hide();
+        } else {
+            $('#error').show();
+            $('#tsp').val('');
+            $('#psp').val('');
+            chart.series[0].setData([]);
+            chart.series[1].setData([]);
+            chart.redraw();
+        }
+    });
 
     var running;
     var degreeunit;
@@ -77,9 +93,6 @@
         $('#tsp').val(parseFloat(data.t.replace('C', '')));
     });
 
-    const $ = jQuery = require('jquery')
-    const Highcharts = require('highcharts')
-
     $('#setp').click(function () {
         ipc.send('setp', $('#psp').val());
     });
@@ -88,7 +101,6 @@
         ipc.send('sett', val);
     });
 
-    require('highcharts/themes/gray.js')(Highcharts)
 
     var series;
     var chart;
