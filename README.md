@@ -34,7 +34,9 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 * [ ] Show current profile
 * [ ] Change current profile
 * [ ] Hit fire button
+* [ ] App icon
 * [ ] Linux support
+
 
 
 ### License
