@@ -5,6 +5,10 @@
 ![Screenshot](screenshot.png "Screenshot")
 
 
+This tool can't - and will never - replace the Escribe software, it's just the device-monitoring part and still work in 
+progress.
+
+
 ### Download
 
 [dna-monitor.zip](https://github.com/hobbyquaker/dna-monitor/releases/latest)
