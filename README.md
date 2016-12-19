@@ -21,6 +21,7 @@ Connect your DNA Device to your Mac, wait a moment, start the Application.
 
 ### Todo
 
+* [ ] Support Degree Farenheit
 * [ ] Catch errors (no serialport available, ...)
 * [ ] Show more values: Battery Voltage
 * [ ] Show more values: Coil Voltage
