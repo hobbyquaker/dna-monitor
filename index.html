@@ -18,6 +18,7 @@
         <select class="form-control" id="degreeunit">
             <option value="C">°C</option>
             <option value="F">°F</option>
+            <!--<option value="OFF">OFF</option>-->
         </select>
         <input class="btn btn-large btn-default" id="sett" type="button" value="set">
     </div>
@@ -27,8 +28,8 @@
     require('./renderer.js');
 
     const ipc = require('electron').ipcRenderer;
-    const $ = jQuery = require('jquery')
-    const Highcharts = require('highcharts')
+    const $ = jQuery = require('jquery');
+    const Highcharts = require('highcharts');
     require('highcharts/themes/gray.js')(Highcharts);
 
 
@@ -97,8 +98,12 @@
         ipc.send('setp', $('#psp').val());
     });
     $('#sett').click(function () {
-        var val = $('#tsp').val() + $('#degreeunit').val();
-        ipc.send('sett', val);
+        var unit = $('#degreeunit').val();
+        if (unit === 'OFF') {
+            ipc.send('sett', 'OFF');
+        } else {
+            ipc.send('sett', $('#tsp').val() + unit);
+        }
     });
 
 
