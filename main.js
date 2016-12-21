@@ -170,3 +170,8 @@ ipc.on('setp', function (e, val) {
 ipc.on('sett', function (e, val) {
     port.write('T=' + val + '\n');
 });
+
+
+ipc.on('fire', function (e, val) {
+    port.write('F=' + val + 'S\n');
+});
