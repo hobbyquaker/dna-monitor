@@ -24,12 +24,15 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 * [x] Support Degree Farenheit
 * [x] Catch errors if no serialport available
 * [x] Vertical resize of chart on window resizing
+* [ ] Menu
+* [ ] CSV export
+* [ ] Option to keep data of preceding puffs
+* [ ] Show last puffs duration and max temperature
 * [ ] Build job with automatic tagging, electron-packager and github release
 * [ ] Show more values: Battery Voltage
-* [ ] Show more values: Coil Voltage
 * [ ] Show more values: Current
 * [ ] Show more values: Resistance
-* [ ] Show more values: ...
+* [ ] Show more values: Device temperature
 * [ ] Show more Infos: Device manufactor, type, ...
 * [ ] Show current profile
 * [ ] Change current profile
