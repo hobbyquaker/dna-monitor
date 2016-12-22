@@ -74,7 +74,7 @@ function start(sport) {
 
     port.on('open', () => {
         mainWindow.webContents.send('sport', true);
-        setTimeout(pollPuff, 1000);
+        setTimeout(pollSettings, 100);
 
     });
 
