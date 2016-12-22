@@ -157,76 +157,73 @@
     var series;
     var chart;
     $(document).ready(function() {
-      chart = new Highcharts.Chart({
+        chart = new Highcharts.Chart({
         chart: {
-          renderTo: 'chart',
-          type: 'line'
-
+            renderTo: 'chart',
+            type: 'line'
+        },
+        credits: {
+            enabled: false
         },
         legend: {
-          enabled: false
+            enabled: false
         },
         title: {text: ''},
         xAxis: {
-          min: 0
+            min: 0
         },
         yAxis: [{ // Primary yAxis
             minrange: 120,
-          labels: {
-            format: '{value}°C',
-            style: {
-              color: Highcharts.getOptions().colors[2]
-            }
-
-          },
-          title: {
-            text: 'Temperature',
-            style: {
-              color: Highcharts.getOptions().colors[2]
-            }
-          },
-          opposite: false
-
-        },
-          { // Primary yAxis
             labels: {
-              format: '{value} W',
-              style: {
-                color: Highcharts.getOptions().colors[3]
-              }
+                format: '{value}°C',
+                    style: {
+                      color: Highcharts.getOptions().colors[2]
+                    }
+                },
+            title: {
+                text: 'Temperature',
+                style: {
+                    color: Highcharts.getOptions().colors[2]
+                }
+            },
+            opposite: false
+        },
+        { // Primary yAxis
+            labels: {
+                format: '{value} W',
+                style: {
+                    color: Highcharts.getOptions().colors[3]
+                }
             },
             title: {
-              text: 'Power',
-              style: {
-                color: Highcharts.getOptions().colors[3]
-              }
+                text: 'Power',
+                style: {
+                    color: Highcharts.getOptions().colors[3]
+                }
             },
             opposite: true
-
-          }],
+        }],
         plotOptions: {
-          line: {
+            line: {
             marker: {
-              enabled: false
+                enabled: false
             }
           }
         },
         series: [
-          {
-            name: 'Temperature',
-            data: [],
-            yAxis: 0,
-            color: Highcharts.getOptions().colors[2]
-          },
-          {
-            name: 'Power',
-            data: [],
-            yAxis: 1,
-            color: Highcharts.getOptions().colors[3]
-          }
+            {
+                name: 'Temperature',
+                data: [],
+                yAxis: 0,
+                color: Highcharts.getOptions().colors[2]
+            },
+            {
+                name: 'Power',
+                data: [],
+                yAxis: 1,
+                color: Highcharts.getOptions().colors[3]
+            }
         ]
-
-
       });
     })
   </script>
