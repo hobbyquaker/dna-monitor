@@ -61,6 +61,10 @@
                 chart.redraw();
                 start = (new Date()).getTime();
                 running = true;
+                setpChange = false;
+                settChange = false;
+                setpVal = null;
+                settVal = null;
             }
 
             if (running && !degreeunit && data.T.match(/C/)) {
@@ -93,13 +97,30 @@
       }
     });
 
+    var setpVal;
+    var setpChange;
+    var settVal;
+    var settChange;
+
     ipc.on('setpoints', function (event, data) {
-        $('#psp').val(parseFloat(data.P.replace('W', '')));
-        $('#tsp').val(parseFloat(data.T.replace('C', '')));
+        var p = parseFloat(data.P.replace('W', ''));
+        if (setpVal !== p) {
+            setpVal = p;
+            if (!setpChange) $('#psp').val(setpVal);
+        }
+        var t = parseFloat(data.T.replace('C', ''));
+        if (settVal !== t) {
+            settVal = t;
+            if (!settChange) $('#tsp').val(settVal);
+        }
+
     });
 
     $('#setp').click(function () {
         ipc.send('setp', $('#psp').val());
+        setTimeout(function () {
+            setpChange = false;
+        }, 100);
     });
     $('#sett').click(function () {
         var unit = $('#degreeunit').val();
@@ -108,6 +129,25 @@
         } else {
             ipc.send('sett', $('#tsp').val() + unit);
         }
+        setTimeout(function () {
+            settChange = false;
+        }, 100);
+    });
+
+    $('#psp').change(function () {
+        setpChange = $('#psp').val() !== setpVal;
+    });
+
+    $('#psp').focus(function () {
+        setpChange = $('#psp').val() !== setpVal;
+    });
+
+    $('#tsp').change(function () {
+        settChange = $('#tsp').val() !== settVal;
+    });
+
+    $('#tsp').focus(function () {
+        settChange = $('#tsp').val() !== settVal;
     });
 
     $('#fire').click(function () {

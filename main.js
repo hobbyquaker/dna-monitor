@@ -12,7 +12,7 @@ const ipc = require('electron').ipcMain;
 let mainWindow;
 
 function createWindow () {
-    mainWindow = new BrowserWindow({width: 800, height: 480});
+    mainWindow = new BrowserWindow({width: 1280, height: 480});
 
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
@@ -21,27 +21,27 @@ function createWindow () {
     }));
 
     // Open the DevTools.
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     // let's go!
-    setTimeout(function () {
+    setTimeout(() => {
         findport(start);
     }, 1000);
 
-    mainWindow.on('closed', function () {
+    mainWindow.on('closed', () => {
         mainWindow = null;
-        port.close();
+        if (port) port.close();
         process.exit(0);
     });
 }
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', function () {
+app.on('window-all-closed', () => {
     app.quit();
 });
 
-app.on('activate', function () {
+app.on('activate', () => {
     if (mainWindow === null) {
         createWindow();
     }
@@ -62,7 +62,7 @@ function findport(cb) {
     if (sport) {
         cb(sport)
     } else {
-        setTimeout(function () {
+        setTimeout(() => {
             findport(cb);
         }, 1000);
     }
@@ -72,7 +72,7 @@ function findport(cb) {
 function start(sport) {
     port = new SerialPort(sport);
 
-    port.on('open', function () {
+    port.on('open', () => {
         mainWindow.webContents.send('sport', true);
         setTimeout(pollPuff, 1000);
 
@@ -84,7 +84,7 @@ function start(sport) {
         findport(start);
     });
 
-    port.on('data', function (data) {
+    port.on('data', data => {
         var [datapoint, value] = data.toString().replace(/\r\n$/, '').split('=');
         if (callbacks[datapoint]) {
             let cb = callbacks[datapoint];
@@ -105,7 +105,7 @@ function cmdGet(dp, mod, cb) {
     if (!port) {
         if (typeof cb === 'function') cb(new Error('serialport missing'));
     } else {
-        port.write(s + '\r\n', function (err) {
+        port.write(s + '\r\n', err => {
             if (err) {
                 if (typeof cb === 'function') cb(err.message);
             } else {
@@ -116,7 +116,7 @@ function cmdGet(dp, mod, cb) {
                             delete callbacks[dp];
                             cb(new Error('timeout'));
                         }
-                    }, 20);
+                    }, 15);
                 }
             }
         });
@@ -138,15 +138,15 @@ function ipcSend(key, data) {
     mainWindow.webContents.send(key, data);
 }
 
-ipc.on('setp', function (e, val) {
+ipc.on('setp', (e, val) => {
     cmdSet('P', val + 'W');
 });
 
-ipc.on('sett', function (e, val) {
+ipc.on('sett', (e, val) => {
     cmdSet('T', val);
 });
 
-ipc.on('fire', function (e, val) {
+ipc.on('fire', (e, val) => {
     cmdSet('F', val + 'S');
 });
 
@@ -166,11 +166,15 @@ function pollPuff() {
         });
     });
     async.series(cmdQueue, (err, res) => {
-        var obj = {};
-        dps.forEach((dp, index) => {
-            obj[dp] = res[index];
-        });
-        ipcSend('values', obj);
+        var obj;
+        if (!err) {
+            obj = {};
+            dps.forEach((dp, index) => {
+                obj[dp] = res[index];
+            });
+            ipcSend('values', obj);
+        }
+
         if (++pc > 50) {
             pc = 0;
             setTimeout(pollSettings, 20);
@@ -193,12 +197,14 @@ function pollSettings() {
         });
     });
     async.series(cmdQueue, (err, res) => {
-        var obj = {};
-        dps.forEach((dp, index) => {
-            obj[dp] = res[index];
-        });
-        ipcSend('setpoints', obj);
+        if (!err) {
+            let obj = {};
+            dps.forEach((dp, index) => {
+                obj[dp] = res[index];
+            });
+            ipcSend('setpoints', obj);
+
+        }
         setTimeout(pollPuff, 20);
     });
 }
-
