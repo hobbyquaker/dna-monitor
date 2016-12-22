@@ -27,7 +27,7 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 * [ ] Menu
 * [ ] CSV export
 * [ ] Option to keep data of preceding puffs
-* [ ] Show last puffs duration and max temperature
+* [x] Show last puffs duration and max temperature
 * [ ] Build job with automatic tagging, electron-packager and github release
 * [ ] Show more values: Battery Voltage
 * [ ] Show more values: Current
