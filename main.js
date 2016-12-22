@@ -1,24 +1,19 @@
 const electron = require('electron');
-// Module to control application life.
 const app = electron.app;
-// Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
+const async = require('async');
 const SerialPort = require('serialport');
 const ipc = require('electron').ipcMain;
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
 function createWindow () {
-    // Create the browser window.
     mainWindow = new BrowserWindow({width: 800, height: 480});
 
-    // and load the index.html of the app.
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
@@ -33,26 +28,16 @@ function createWindow () {
         findport(start);
     }, 1000);
 
-    // Emitted when the window is closed.
     mainWindow.on('closed', function () {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
         mainWindow = null;
         port.close();
         process.exit(0);
     });
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on('ready', createWindow);
 
-// Quit when all windows are closed.
 app.on('window-all-closed', function () {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
     app.quit();
 });
 
@@ -61,7 +46,6 @@ app.on('activate', function () {
         createWindow();
     }
 });
-
 
 var port = null;
 var callbacks = {};
@@ -90,7 +74,7 @@ function start(sport) {
 
     port.on('open', function () {
         mainWindow.webContents.send('sport', true);
-        setTimeout(poll, 1000);
+        setTimeout(pollPuff, 1000);
 
     });
 
@@ -101,77 +85,120 @@ function start(sport) {
     });
 
     port.on('data', function (data) {
-        var [datapoint, value] = data.toString().replace(/\n$/, '').split('=');
+        var [datapoint, value] = data.toString().replace(/\r\n$/, '').split('=');
         if (callbacks[datapoint]) {
             let cb = callbacks[datapoint];
             delete callbacks[datapoint];
             cb(null, value);
-        } else if (callbacks[datapoint + 'SP']) {
-            let cb = callbacks[datapoint + 'SP'];
-            delete callbacks[datapoint];
-            cb(null, value);
         }
     });
 }
 
-function getValue(val, cb) {
-    port.write(val + '=GET\n', function (err) {
-        if (err) {
-            cb(err.message);
-        } else {
-            callbacks[val] = cb;
-        }
-    });
-}
+function cmdGet(dp, mod, cb) {
+    if (typeof mod === 'function') {
+        cb = mod;
+        mod = null;
+    }
+    var s = dp + '=GET';
+    if (mod) s = s + ' ' + mod;
 
-function getSP(val, cb) {
-    port.write(val + '=GET SP\n', function (err) {
-        if (err) {
-            cb(err.message);
-        } else {
-            callbacks[val + 'SP'] = cb;
-        }
-    });
-}
-
-var pc = 0;
-
-function poll() {
-    if (!port) return;
-    getValue('T', (err, t) => {
-        if (!port) return;
-        getValue('P', (err, p) => {
-            if (!port) return;
-            if (!mainWindow) process.exit(0);
-            mainWindow.webContents.send('values', {t:t, p:p});
-            pc++;
-            if (pc > 50 && p.match(/W/)) {
-                pc = 0;
-                getSP('T', (err, tsp) => {
-                    if (!port) return;
-                    getSP('P', (err, psp) => {
-                        if (!port) return;
-                        if (!mainWindow) process.exit(0);
-                        mainWindow.webContents.send('setpoints', {t:tsp, p:psp});
-                        setTimeout(poll, 20);
-                    });
-                });
+    if (!port) {
+        if (typeof cb === 'function') cb(new Error('serialport missing'));
+    } else {
+        port.write(s + '\r\n', function (err) {
+            if (err) {
+                if (typeof cb === 'function') cb(err.message);
             } else {
-              setTimeout(poll, 20);
+                if (typeof cb === 'function') {
+                    callbacks[dp] = cb;
+                    setTimeout(() => {
+                        if (callbacks[dp]) {
+                            delete callbacks[dp];
+                            cb(new Error('timeout'));
+                        }
+                    }, 20);
+                }
             }
         });
-    });
+    }
+
+}
+
+function cmdSet(dp, val, cb) {
+    if (!port) {
+        if (typeof cb === 'function') cb(new Error('serialport missing'));
+    } else {
+        port.write(dp + '=' + val + '\r\n', cb);
+    }
+}
+
+function ipcSend(key, data) {
+    if (!mainWindow) process.exit(0);
+    console.log(key, data);
+    mainWindow.webContents.send(key, data);
 }
 
 ipc.on('setp', function (e, val) {
-    port.write('P=' + val + 'W\n');
+    cmdSet('P', val + 'W');
 });
 
 ipc.on('sett', function (e, val) {
-    port.write('T=' + val + '\n');
+    cmdSet('T', val);
 });
-
 
 ipc.on('fire', function (e, val) {
-    port.write('F=' + val + 'S\n');
+    cmdSet('F', val + 'S');
 });
+
+
+
+var pc = 50;
+
+var pollPuffDatapoints = ['T', 'P'];
+
+function pollPuff() {
+    var dps = [];
+    var cmdQueue = [];
+    pollPuffDatapoints.forEach(dp => {
+        dps.push(dp);
+        cmdQueue.push(cb => {
+            cmdGet(dp, cb);
+        });
+    });
+    async.series(cmdQueue, (err, res) => {
+        var obj = {};
+        dps.forEach((dp, index) => {
+            obj[dp] = res[index];
+        });
+        ipcSend('values', obj);
+        if (++pc > 50) {
+            pc = 0;
+            setTimeout(pollSettings, 20);
+        } else {
+            setTimeout(pollPuff, 20);
+        }
+
+    });
+}
+
+var pollSettingsDatapoints = ['T', 'P'];
+
+function pollSettings() {
+    var dps = [];
+    var cmdQueue = [];
+    pollSettingsDatapoints.forEach(dp => {
+        dps.push(dp);
+        cmdQueue.push(cb => {
+            cmdGet(dp, 'SP', cb);
+        });
+    });
+    async.series(cmdQueue, (err, res) => {
+        var obj = {};
+        dps.forEach((dp, index) => {
+            obj[dp] = res[index];
+        });
+        ipcSend('setpoints', obj);
+        setTimeout(pollPuff, 20);
+    });
+}
+

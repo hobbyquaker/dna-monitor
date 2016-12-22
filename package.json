@@ -23,6 +23,7 @@
     "electron-packager": "^8.4.0"
   },
   "dependencies": {
+    "async": "^2.1.4",
     "highcharts": "^5.0.6",
     "jquery": "^3.1.1",
     "photonkit": "^0.1.2",
