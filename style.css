@@ -6,7 +6,7 @@ body {
 }
 
 #chart {
-    height: calc(100% - 60px);
+    height: calc(100% - 100px);
 }
 
 #error {
@@ -19,12 +19,17 @@ body {
     z-index: 1000;
 }
 
-.unit, .label {
+.unit, .label, .stats {
     color: #eee;
 }
 
+.stats {
+    min-width: 60px;
+    display: inline-block;
+}
+
 .label {
-    padding-left: 50px;
+    padding-left: 32px;
     padding-right: 6px;
 }
 

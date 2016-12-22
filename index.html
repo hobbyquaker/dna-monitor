@@ -26,6 +26,12 @@
         <input class="form-control" id="duration" type="number" value="1.0">
         <span class="unit">s</span>
     </div>
+  <div id="stats">
+      <span class="label">Max Power:</span><span class="stats" id="maxPower"></span>
+      <span class="label">Max Temperature:</span><span class="stats" id="maxTemperature"></span>
+      <span class="label">Temperature rise time:</span><span class="stats" id="riseTime"></span>
+      <span class="label">Puff Duration:</span><span class="stats" id="elapsed"></span>
+  </div>
   </body>
 
   <script>
@@ -53,6 +59,11 @@
     var running;
     var degreeunit;
     var start;
+    var maxPower;
+    var maxTemperature;
+    var riseTime;
+    var elapsed;
+
     ipc.on('values', function (event, data) {
         if (data.P.match(/W/)) {
             if (!running) {
@@ -65,6 +76,9 @@
                 settChange = false;
                 setpVal = null;
                 settVal = null;
+                maxPower = 0;
+                maxTemperature = 0;
+                riseTime = 0;
             }
 
             if (running && !degreeunit && data.T.match(/C/)) {
@@ -88,12 +102,23 @@
 
             var t = parseFloat(data.T.replace('C', ''));
             var p = parseFloat(data.P.replace('W', ''));
-            var elapsed = ((new Date()).getTime() - start) / 1000;
+            elapsed = ((new Date()).getTime() - start) / 1000;
             chart.series[0].addPoint([elapsed, t], true, false, false);
             chart.series[1].addPoint([elapsed, p], true, false, false);
+            if (t > maxTemperature) maxTemperature = t;
+            if (p > maxPower) maxPower = p;
+            if (riseTime === 0 && $('#tsp').val() > 0 && t > $('#tsp').val()) {
+                riseTime = elapsed;
+            }
       } else {
-        running = false;
-        degreeunit = false;
+            if (running) {
+                $('#elapsed').html(elapsed + ' s');
+                $('#maxPower').html(maxPower + ' W');
+                $('#maxTemperature').html(maxTemperature + '°' + $('#degreeunit').val());
+                $('#riseTime').html(riseTime + ' s');
+            }
+            running = false;
+            degreeunit = false;
       }
     });
 

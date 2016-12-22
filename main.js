@@ -12,7 +12,7 @@ const ipc = require('electron').ipcMain;
 let mainWindow;
 
 function createWindow () {
-    mainWindow = new BrowserWindow({width: 1280, height: 480});
+    mainWindow = new BrowserWindow({width: 1280, height: 520});
 
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
@@ -133,9 +133,12 @@ function cmdSet(dp, val, cb) {
 }
 
 function ipcSend(key, data) {
-    if (!mainWindow) process.exit(0);
-    console.log(key, data);
-    mainWindow.webContents.send(key, data);
+    if (mainWindow) {
+        mainWindow.webContents.send(key, data);
+    } else {
+        port.close();
+        process.exit(0);
+    }
 }
 
 ipc.on('setp', (e, val) => {
