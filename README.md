@@ -32,12 +32,14 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 * [ ] Build job with automatic tagging, electron-packager and github release
 * [x] Show more values: Battery Voltage
 * [x] Show more values: Current
-* [ ] Show more values: Resistance
+* [x] Show more values: Resistance
 * [x] Show more values: Voltage
 * [ ] Show more values: Device temperature
+* [ ] Show more values: Room temperature
 * [ ] Show more stats: Max battery voltage drop
 * [x] Show more Infos: Device manufactor, type, ...
-* [ ] Show more Infos: Cold resistance
+* [x] Show more Infos: Cold resistance
+* [x] Show more Infos: Battery voltage
 * [ ] Show current profile
 * [ ] Change current profile
 * [x] Hit fire button
