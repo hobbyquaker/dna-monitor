@@ -12,8 +12,9 @@ ipc.on('sport', function (event, data) {
         $('#tsp').val('');
         $('#psp').val('');
         $('#infos').html('');
-        chart.series[0].setData([]);
-        chart.series[1].setData([]);
+        chart.series.forEach(series => {
+            series.setData([]);
+        });
         chart.redraw();
     }
 });
@@ -35,11 +36,9 @@ ipc.on('infos', (event, data) => {
 ipc.on('values', (event, data) => {
     if (data.P.match(/W/)) {
         if (!running) {
-            chart.series[0].setData([]);
-            chart.series[1].setData([]);
-            chart.series[2].setData([]);
-            chart.series[3].setData([]);
-            chart.series[4].setData([]);
+            chart.series.forEach(series => {
+                series.setData([]);
+            });
             chart.redraw();
             start = (new Date()).getTime();
             running = true;
@@ -96,6 +95,10 @@ ipc.on('values', (event, data) => {
             let i = parseFloat(data.I);
             chart.series[4].addPoint([elapsed, i], true, false, false);
         }
+        if (visibleAxis.indexOf('RLIVE') !== -1) {
+            let r = parseFloat(data.R);
+            chart.series[5].addPoint([elapsed, r], true, false, false);
+        }
         if (t > maxTemperature) maxTemperature = t;
         if (p > maxPower) maxPower = p;
         if (riseTime === 0 && $('#tsp').val() > 0 && t > $('#tsp').val()) {
@@ -121,6 +124,7 @@ var degreeVal;
 var degreeChange;
 
 ipc.on('setpoints', (event, data) => {
+    console.log('setpoints', data);
     var p = parseFloat(data.P.replace('W', ''));
     if (setpVal !== p) {
         setpVal = p;
@@ -145,6 +149,16 @@ ipc.on('setpoints', (event, data) => {
     if (degreeVal !== d) {
         degreeVal = d;
         if (!degreeChange) $('#degreeunit').val(d);
+    }
+
+    if (data.B) {
+        let b = parseFloat(data.B);
+        $('#battery').html(b + ' V');
+    }
+
+    if (data.R) {
+        let r = parseFloat(data.R);
+        $('#resistance').html(r + ' Ohm');
     }
 
 });
@@ -291,6 +305,21 @@ $(document).ready(() => {
                     }
                 },
                 opposite: true
+            },
+            { // 5 R LIVE
+                labels: {
+                    format: '{value} Ohm',
+                    style: {
+                        color: Highcharts.getOptions().colors[4]
+                    }
+                },
+                title: {
+                    text: '',
+                    style: {
+                        color: Highcharts.getOptions().colors[4]
+                    }
+                },
+                opposite: true
             }
         ],
         plotOptions: {
@@ -358,6 +387,18 @@ $(document).ready(() => {
                         toggleAxis(this.name, !this.visible);
                     }
                 }
+            },
+            {
+                name: 'Resistance',
+                visible: false,
+                data: [],
+                yAxis: 5,
+                color: Highcharts.getOptions().colors[4],
+                events: {
+                    legendItemClick: function () {
+                        toggleAxis(this.name, !this.visible);
+                    }
+                }
             }
 
         ]
@@ -365,7 +406,7 @@ $(document).ready(() => {
 
     var axisNames = {
         'Current': 'I',
-        'Resistance': 'R',
+        'Resistance': 'RLIVE',
         'Voltage': 'V',
         'Battery': 'B'
     };

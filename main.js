@@ -12,7 +12,7 @@ const ipc = require('electron').ipcMain;
 let mainWindow;
 
 function createWindow () {
-    mainWindow = new BrowserWindow({width: 860, height: 520});
+    mainWindow = new BrowserWindow({width: 1286, height: 520});
 
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
@@ -21,7 +21,7 @@ function createWindow () {
     }));
 
     // Open the DevTools.
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     // let's go!
     setTimeout(() => {
@@ -105,9 +105,12 @@ function cmdGet(dp, mod, cb) {
         cb = mod;
         mod = null;
     }
+    if (dp.length > 1) {
+        mod = dp.substr(1, dp.length);
+        dp = dp.substr(0, 1);
+    }
     var s = dp + '=GET';
     if (mod) s = s + ' ' + mod;
-
     if (!port) {
         if (typeof cb === 'function') cb(new Error('serialport missing'));
     } else {
@@ -161,7 +164,7 @@ ipc.on('fire', (e, val) => {
 });
 
 
-
+var running;
 var pc = 50;
 
 var pollPuffDatapoints = ['T', 'P'];
@@ -174,7 +177,9 @@ function pollPuff() {
     var dps = [];
     var cmdQueue = [];
     pollPuffDatapoints.forEach(dp => {
-        dps.push(dp);
+        let d = dp;
+        if (d.length > 1) d = d.substr(0, 1);
+        dps.push(d);
         cmdQueue.push(cb => {
             cmdGet(dp, cb);
         });
@@ -184,6 +189,11 @@ function pollPuff() {
         if (!err) {
             obj = {};
             dps.forEach((dp, index) => {
+                if (dp === 'P' && res[index] !== '?' && !running) {
+                    running = true;
+                } else if (dp === 'P' && res[index] === '?' && running) {
+                    running = false;
+                }
                 obj[dp] = res[index];
             });
             ipcSend('values', obj);
@@ -199,15 +209,25 @@ function pollPuff() {
     });
 }
 
-var pollSettingsDatapoints = ['T', 'P'];
+var pollSettingsDatapoints = ['TSP', 'PSP', 'R', 'B'];
+
 
 function pollSettings() {
     var dps = [];
     var cmdQueue = [];
     pollSettingsDatapoints.forEach(dp => {
-        dps.push(dp);
+        if (running && dp === 'B') return;
+        dps.push(dp.substr(0, 1));
         cmdQueue.push(cb => {
-            cmdGet(dp, 'SP', cb);
+            let d = dp;
+            let m;
+            if (dp.length > 1) {
+                d = dp.substr(0, 1);
+                m = dp.substr(1, dp.length);
+            }
+            cmdGet(d, m, (err, res) => {
+                cb(err, res);
+            });
         });
     });
     async.series(cmdQueue, (err, res) => {
