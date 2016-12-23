@@ -119,7 +119,7 @@ function cmdGet(dp, mod, cb) {
                     callbacks[dp] = cb;
                     setTimeout(() => {
                         if (port && callbacks[dp]) {
-                            console.log('timeout', dp);
+                            //console.log('timeout', dp);
                             cb(new Error('timeout'));
                             delete callbacks[dp];
                         }
