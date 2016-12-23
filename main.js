@@ -12,7 +12,7 @@ const ipc = require('electron').ipcMain;
 let mainWindow;
 
 function createWindow () {
-    mainWindow = new BrowserWindow({width: 1280, height: 520});
+    mainWindow = new BrowserWindow({width: 860, height: 520});
 
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
@@ -21,7 +21,7 @@ function createWindow () {
     }));
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
 
     // let's go!
     setTimeout(() => {
