@@ -92,7 +92,10 @@ function start(sport) {
         if (callbacks[datapoint]) {
             let cb = callbacks[datapoint];
             delete callbacks[datapoint];
-            cb(null, value);
+            setTimeout(() => {
+                cb(null, value);
+            }, 5);
+
         }
     });
 }
