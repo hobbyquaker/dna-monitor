@@ -28,6 +28,11 @@ body {
     display: inline-block;
 }
 
+#infos {
+    padding-left: 32px;
+    color: #777;
+}
+
 .label {
     padding-left: 32px;
     padding-right: 6px;

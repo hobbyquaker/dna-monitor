@@ -74,14 +74,17 @@ function start(sport) {
 
     port.on('open', () => {
         mainWindow.webContents.send('sport', true);
-        setTimeout(pollSettings, 100);
+        setTimeout(pollInfos, 100);
 
     });
 
     port.on('disconnect', () => {
-        mainWindow.webContents.send('sport', false);
         port = null;
-        findport(start);
+        callbacks = {};
+        mainWindow.webContents.send('sport', false);
+        setTimeout(() => {
+            findport(start);
+        }, 500);
     });
 
     port.on('data', data => {
@@ -112,11 +115,12 @@ function cmdGet(dp, mod, cb) {
                 if (typeof cb === 'function') {
                     callbacks[dp] = cb;
                     setTimeout(() => {
-                        if (callbacks[dp]) {
-                            delete callbacks[dp];
+                        if (port && callbacks[dp]) {
+                            console.log('timeout', dp);
                             cb(new Error('timeout'));
+                            delete callbacks[dp];
                         }
-                    }, 15);
+                    }, 20);
                 }
             }
         });
@@ -180,9 +184,9 @@ function pollPuff() {
 
         if (++pc > 50) {
             pc = 0;
-            setTimeout(pollSettings, 20);
+            setTimeout(pollSettings, 25);
         } else {
-            setTimeout(pollPuff, 20);
+            setTimeout(pollPuff, 25);
         }
 
     });
@@ -208,6 +212,49 @@ function pollSettings() {
             ipcSend('setpoints', obj);
 
         }
-        setTimeout(pollPuff, 20);
+        setTimeout(pollPuff, 100);
+    });
+}
+
+function pollInfos() {
+    var pollInfosDatapoints = [
+        ['E', 'MFR'],
+        ['E', 'PRODUCT'],
+        ['B', 'CELLS'],
+        ['E', 'FEATURE 1'],
+        ['E', 'FEATURE 2'],
+        ['E', 'FEATURE 3'],
+        ['E', 'FEATURE 4'],
+        ['E', 'FEATURE 5'],
+        ['E', 'FEATURE 6'],
+        ['E', 'FEATURE 7'],
+        ['E', 'FEATURE 8'],
+        ['E', 'FEATURE 9']
+    ];
+    var dps = [];
+    var cmdQueue = [];
+    pollInfosDatapoints.forEach(dp => {
+        dps.push(dp);
+        cmdQueue.push(cb => {
+            cmdGet(dp[0], dp[1], (err, res) => {
+                setTimeout(() => {
+                    cb(err, res);
+                }, 75)
+            });
+        });
+    });
+    async.series(cmdQueue, (err, res) => {
+        if (!err) {
+            let obj = {'FEATURES':[]};
+            dps.forEach((dp, index) => {
+                if (dp[1].match(/FEATURE/)) {
+                    if (res[index] !== '?') obj.FEATURES.push(res[index]);
+                } else {
+                    obj[dp[1]] = res[index];
+                }
+            });
+            ipcSend('infos', obj);
+        }
+        setTimeout(pollSettings, 100);
     });
 }
