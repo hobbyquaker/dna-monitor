@@ -6,7 +6,7 @@ body {
 }
 
 #chart {
-    height: calc(100% - 100px);
+    height: calc(100% - 120px);
 }
 
 #error {
@@ -21,6 +21,10 @@ body {
 
 .unit, .label, .stats {
     color: #eee;
+}
+
+#stats {
+    padding-bottom: 12px;
 }
 
 .stats {

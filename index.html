@@ -11,6 +11,12 @@
         Searching for DNA device...
     </div>
     <div id="chart"></div>
+    <div id="stats">
+        <span class="label">Max Power:</span><span class="stats" id="maxPower"></span>
+        <span class="label">Max Temperature:</span><span class="stats" id="maxTemperature"></span>
+        <span class="label">Temperature rise time:</span><span class="stats" id="riseTime"></span>
+        <span class="label">Puff Duration:</span><span class="stats" id="elapsed"></span>
+    </div>
     <div id="controls">
         <span class="label">Power</span><input class="form-control" id="psp" type="number"> <span class="unit">W</span>
         <input class="btn btn-large btn-default" id="setp" type="button" value="set">
@@ -26,12 +32,7 @@
         <input class="form-control" id="duration" type="number" value="1.0">
         <span class="unit">s</span>
     </div>
-  <div id="stats">
-      <span class="label">Max Power:</span><span class="stats" id="maxPower"></span>
-      <span class="label">Max Temperature:</span><span class="stats" id="maxTemperature"></span>
-      <span class="label">Temperature rise time:</span><span class="stats" id="riseTime"></span>
-      <span class="label">Puff Duration:</span><span class="stats" id="elapsed"></span>
-  </div>
+
     <div>
         <span class="label">Battery:</span><span class="stats" id="battery"></span>
         <span class="label">Cold resistance:</span><span class="stats" id="resistance"></span>
