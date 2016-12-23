@@ -26,6 +26,8 @@ var maxTemperature;
 var riseTime;
 var elapsed;
 
+var visibleAxis = ['P', 'T'];
+
 ipc.on('infos', (event, data) => {
     $('#infos').html((data.MFR !== '?' ? data.MFR + ' ' : '') + data.PRODUCT + ', ' + data.CELLS + ' battery cell' + (data.CELLS > 1 ? 's' : '') + ', ' + data.FEATURES.join(', '));
 });
@@ -35,6 +37,9 @@ ipc.on('values', (event, data) => {
         if (!running) {
             chart.series[0].setData([]);
             chart.series[1].setData([]);
+            chart.series[2].setData([]);
+            chart.series[3].setData([]);
+            chart.series[4].setData([]);
             chart.redraw();
             start = (new Date()).getTime();
             running = true;
@@ -74,11 +79,23 @@ ipc.on('values', (event, data) => {
             degreeunit = true;
         }
 
-        var t = parseFloat(data.T.replace('C', ''));
-        var p = parseFloat(data.P.replace('W', ''));
+        var t = parseFloat(data.T);
+        var p = parseFloat(data.P);
         elapsed = ((new Date()).getTime() - start) / 1000;
         chart.series[0].addPoint([elapsed, t], true, false, false);
         chart.series[1].addPoint([elapsed, p], true, false, false);
+        if (visibleAxis.indexOf('V') !== -1) {
+            let v = parseFloat(data.V);
+            chart.series[2].addPoint([elapsed, v], true, false, false);
+        }
+        if (visibleAxis.indexOf('B') !== -1) {
+            let b = parseFloat(data.B);
+            chart.series[3].addPoint([elapsed, b], true, false, false);
+        }
+        if (visibleAxis.indexOf('I') !== -1) {
+            let i = parseFloat(data.I);
+            chart.series[4].addPoint([elapsed, i], true, false, false);
+        }
         if (t > maxTemperature) maxTemperature = t;
         if (p > maxPower) maxPower = p;
         if (riseTime === 0 && $('#tsp').val() > 0 && t > $('#tsp').val()) {
@@ -190,29 +207,31 @@ $(document).ready(() => {
             enabled: false
         },
         legend: {
-            enabled: false
+            enabled: true,
+            align: 'left'
         },
         title: {text: ''},
         xAxis: {
             min: 0
         },
-        yAxis: [{ // Primary yAxis
-            minRange: 120,
-            labels: {
-                format: '{value}°C',
-                style: {
-                    color: Highcharts.getOptions().colors[2]
-                }
+        yAxis: [
+            { // 0 Temperature
+                minRange: 120,
+                labels: {
+                    format: '{value}°C',
+                    style: {
+                        color: Highcharts.getOptions().colors[2]
+                    }
+                },
+                title: {
+                    text: '',
+                    style: {
+                        color: Highcharts.getOptions().colors[2]
+                    }
+                },
+                opposite: false
             },
-            title: {
-                text: 'Temperature',
-                style: {
-                    color: Highcharts.getOptions().colors[2]
-                }
-            },
-            opposite: false
-        },
-            { // Primary yAxis
+            { // 1 Power
                 minRange: 20,
                 labels: {
                     format: '{value} W',
@@ -221,13 +240,59 @@ $(document).ready(() => {
                     }
                 },
                 title: {
-                    text: 'Power',
+                    text: '',
                     style: {
                         color: Highcharts.getOptions().colors[3]
                     }
                 },
                 opposite: true
-            }],
+            },
+            { // 2 Voltage
+                labels: {
+                    format: '{value} V',
+                    style: {
+                        color: Highcharts.getOptions().colors[1]
+                    }
+                },
+                title: {
+                    text: '',
+                    style: {
+                        color: Highcharts.getOptions().colors[1]
+                    }
+                },
+                opposite: true
+            },
+            { // 3 Battery voltage
+                labels: {
+                    format: '{value} V',
+                    style: {
+                        color: Highcharts.getOptions().colors[0]
+                    }
+                },
+                title: {
+                    text: '',
+                    style: {
+                        color: Highcharts.getOptions().colors[0]
+                    }
+                },
+                opposite: true
+            },
+            { // 4 Current
+                labels: {
+                    format: '{value} A',
+                    style: {
+                        color: Highcharts.getOptions().colors[6]
+                    }
+                },
+                title: {
+                    text: '',
+                    style: {
+                        color: Highcharts.getOptions().colors[6]
+                    }
+                },
+                opposite: true
+            }
+        ],
         plotOptions: {
             line: {
                 marker: {
@@ -240,16 +305,82 @@ $(document).ready(() => {
                 name: 'Temperature',
                 data: [],
                 yAxis: 0,
-                color: Highcharts.getOptions().colors[2]
+                color: Highcharts.getOptions().colors[2],
+                events: {
+                    legendItemClick: function () {
+                        return false;
+                    }
+                }
             },
             {
                 name: 'Power',
                 data: [],
                 yAxis: 1,
-                color: Highcharts.getOptions().colors[3]
+                color: Highcharts.getOptions().colors[3],
+                events: {
+                    legendItemClick: function () {
+                        return false;
+                    }
+                }
+            },
+            {
+                name: 'Voltage',
+                visible: false,
+                data: [],
+                yAxis: 2,
+                color: Highcharts.getOptions().colors[1],
+                events: {
+                    legendItemClick: function () {
+                        toggleAxis(this.name, !this.visible);
+                    }
+                }
+            },
+            {
+                name: 'Battery',
+                visible: false,
+                data: [],
+                yAxis: 3,
+                color: Highcharts.getOptions().colors[0],
+                events: {
+                    legendItemClick: function () {
+                        toggleAxis(this.name, !this.visible);
+                    }
+                }
+            },
+            {
+                name: 'Current',
+                visible: false,
+                data: [],
+                yAxis: 4,
+                color: Highcharts.getOptions().colors[6],
+                events: {
+                    legendItemClick: function () {
+                        toggleAxis(this.name, !this.visible);
+                    }
+                }
             }
+
         ]
     });
+
+    var axisNames = {
+        'Current': 'I',
+        'Resistance': 'R',
+        'Voltage': 'V',
+        'Battery': 'B'
+    };
+
+    function toggleAxis(name, visible) {
+        name = axisNames[name];
+        if (visible && visibleAxis.indexOf(name) === -1) {
+            visibleAxis.push(name);
+        } else if (!visible && visibleAxis.indexOf(name) !== -1) {
+            visibleAxis.splice(visibleAxis.indexOf(name), 1);
+        }
+        ipc.send('datapoints', visibleAxis);
+    }
+
+
 });
 
 
