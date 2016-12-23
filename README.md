@@ -33,7 +33,7 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 * [ ] Show more values: Current
 * [ ] Show more values: Resistance
 * [ ] Show more values: Device temperature
-* [ ] Show more Infos: Device manufactor, type, ...
+* [x] Show more Infos: Device manufactor, type, ...
 * [ ] Show current profile
 * [ ] Change current profile
 * [x] Hit fire button
