@@ -3,7 +3,6 @@ const $ = jQuery = require('jquery');
 const Highcharts = require('highcharts');
 require('highcharts/themes/gray.js')(Highcharts);
 
-
 ipc.on('sport', function (event, data) {
     if (data) {
         $('#error').hide();
@@ -19,15 +18,15 @@ ipc.on('sport', function (event, data) {
     }
 });
 
-var running;
-var degreeunit;
-var start;
-var maxPower;
-var maxTemperature;
-var riseTime;
-var elapsed;
+let running;
+let degreeunit;
+let start;
+let maxPower;
+let maxTemperature;
+let riseTime;
+let elapsed;
 
-var visibleAxis = ['P', 'T'];
+let visibleAxis = ['P', 'T'];
 
 ipc.on('infos', (event, data) => {
     $('#infos').html((data.MFR !== '?' ? data.MFR + ' ' : '') + data.PRODUCT + ', ' + data.CELLS + ' battery cell' + (data.CELLS > 1 ? 's' : '') + ', ' + data.FEATURES.join(', '));
@@ -78,8 +77,8 @@ ipc.on('values', (event, data) => {
             degreeunit = true;
         }
 
-        var t = parseFloat(data.T);
-        var p = parseFloat(data.P);
+        let t = parseFloat(data.T);
+        let p = parseFloat(data.P);
         elapsed = ((new Date()).getTime() - start) / 1000;
         chart.series[0].addPoint([elapsed, t], true, false, false);
         chart.series[1].addPoint([elapsed, p], true, false, false);
@@ -116,22 +115,22 @@ ipc.on('values', (event, data) => {
     }
 });
 
-var setpVal;
-var setpChange;
-var settVal;
-var settChange;
-var degreeVal;
-var degreeChange;
+let setpVal;
+let setpChange;
+let settVal;
+let settChange;
+let degreeVal;
+let degreeChange;
 
 ipc.on('setpoints', (event, data) => {
-    var p = parseFloat(data.P.replace('W', ''));
+    let p = parseFloat(data.P.replace('W', ''));
     if (setpVal !== p) {
         setpVal = p;
         if (!setpChange) $('#psp').val(setpVal);
     }
 
-    var t = '';
-    var d = 'OFF';
+    let t = '';
+    let d = 'OFF';
 
     if (data.T.match(/C/)) {
         t = parseFloat(data.T.replace('C', ''));
@@ -169,7 +168,7 @@ $('#setp').click(() => {
     }, 100);
 });
 $('#sett').click(() => {
-    var unit = $('#degreeunit').val();
+    let unit = $('#degreeunit').val();
     if (unit === 'OFF') {
         ipc.send('sett', 'MONITOR');
     } else {
@@ -208,8 +207,8 @@ $('#fire').click(() => {
     ipc.send('fire', $('#duration').val());
 });
 
-var series;
-var chart;
+let series;
+let chart;
 $(document).ready(() => {
     chart = new Highcharts.Chart({
         chart: {
@@ -403,7 +402,7 @@ $(document).ready(() => {
         ]
     });
 
-    var axisNames = {
+    let axisNames = {
         'Current': 'I',
         'Resistance': 'RLIVE',
         'Voltage': 'V',
@@ -430,5 +429,3 @@ $(document).ready(() => {
 
 
 });
-
-
