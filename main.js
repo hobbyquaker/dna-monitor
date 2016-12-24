@@ -3,6 +3,7 @@ const app =                 electron.app;
 const Menu =                electron.Menu;
 const ipc =                 electron.ipcMain;
 const BrowserWindow =       electron.BrowserWindow;
+const dialog =              electron.dialog;
 
 const storage =             require('electron-json-storage');
 const windowStateKeeper =   require('electron-window-state');
@@ -352,7 +353,8 @@ var menuTemplate = [
             },
             {
                 role: 'export',
-                label: 'Export csv'
+                label: 'Export csv',
+                click() { exportCsv(); }
             }
         ]
     },
@@ -404,5 +406,16 @@ if (process.platform === 'darwin') {
         ]
     });
 
+}
+
+function exportCsv() {
+    dialog.showSaveDialog({
+        title: 'Export csv',
+        filters: [
+            {name: 'Comma seperated values', extensions: ['csv']}
+        ]
+    }, function (filename) {
+        debug('export', filename);
+    });
 }
 
