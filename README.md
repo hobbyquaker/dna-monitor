@@ -40,6 +40,7 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 * [x] Show more Infos: Cold resistance
 * [x] Show more Infos: Battery voltage
 * [ ] Show more Infos: Battery level percentage
+* [x] Detailed statistics
 * [ ] Show current profile
 * [ ] Change current profile
 * [x] Hit fire button
