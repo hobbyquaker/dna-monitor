@@ -16,14 +16,33 @@ const SerialPort =          require('serialport');
 
 let mainWindow;
 let debug;
+let port = null;
+let callbacks = {};
+let running;
+let pc = 50;
+
+let pollPuffDatapoints =  ['T', 'P'];
+let pollSettingsDatapoints = ['TSP', 'PSP', 'R', 'B'];
+let pollInfosDatapoints = [
+    ['E', 'MFR'],
+    ['E', 'PRODUCT'],
+    ['B', 'CELLS'],
+    ['E', 'FEATURE 1'],
+    ['E', 'FEATURE 2'],
+    ['E', 'FEATURE 3'],
+    ['E', 'FEATURE 4'],
+    ['E', 'FEATURE 5'],
+    ['E', 'FEATURE 6'],
+    ['E', 'FEATURE 7'],
+    ['E', 'FEATURE 8'],
+    ['E', 'FEATURE 9']
+];
 
 if (isDev) {
     debug = console.log;
 } else {
     debug = function () {};
 }
-
-var pollPuffDatapoints =  ['T', 'P'];
 
 function createWindow () {
 
@@ -45,7 +64,6 @@ function createWindow () {
         slashes: true
     }));
 
-    // Open the DevTools.
     if (isDev) mainWindow.webContents.openDevTools();
 
     // let's go!
@@ -82,13 +100,10 @@ app.on('activate', () => {
     }
 });
 
-var port = null;
-var callbacks = {};
-
 function findport(cb) {
-    var devs = (fs.readdirSync('/dev'));
-    var sport;
-    for (var i = 0; i < devs.length; i++) {
+    let devs = (fs.readdirSync('/dev'));
+    let sport;
+    for (let i = 0; i < devs.length; i++) {
         if (devs[i].match(/tty\.usbmodem[0-9A-Z]+/)) {
             sport = '/dev/' + devs[i];
             break;
@@ -117,6 +132,7 @@ function start(sport) {
     });
 
     port.on('disconnect', () => {
+        debug('disconnect', sport);
         port = null;
         callbacks = {};
         mainWindow.webContents.send('sport', false);
@@ -126,13 +142,13 @@ function start(sport) {
     });
 
     port.on('data', data => {
-        var [datapoint, value] = data.toString().replace(/\r\n$/, '').split('=');
+        let [datapoint, value] = data.toString().replace(/\r\n$/, '').split('=');
         if (callbacks[datapoint]) {
             let cb = callbacks[datapoint];
             delete callbacks[datapoint];
             setTimeout(() => {
                 cb(null, value);
-            }, 5);
+            }, 1);
 
         }
     });
@@ -147,7 +163,7 @@ function cmdGet(dp, mod, cb) {
         mod = dp.substr(1, dp.length);
         dp = dp.substr(0, 1);
     }
-    var s = dp + '=GET';
+    let s = dp + '=GET';
     if (mod) s = s + ' ' + mod;
     if (!port) {
         if (typeof cb === 'function') cb(new Error('serialport missing'));
@@ -164,7 +180,7 @@ function cmdGet(dp, mod, cb) {
                             cb(new Error('timeout'));
                             delete callbacks[dp];
                         }
-                    }, 20);
+                    }, 10);
                 }
             }
         });
@@ -202,8 +218,7 @@ ipc.on('fire', (e, val) => {
 });
 
 
-var running;
-var pc = 50;
+
 
 
 
@@ -213,8 +228,8 @@ ipc.on('datapoints', (e, val) => {
 });
 
 function pollPuff() {
-    var dps = [];
-    var cmdQueue = [];
+    let dps = [];
+    let cmdQueue = [];
     pollPuffDatapoints.forEach(dp => {
         let d = dp;
         if (d.length > 1) d = d.substr(0, 1);
@@ -224,7 +239,7 @@ function pollPuff() {
         });
     });
     async.series(cmdQueue, (err, res) => {
-        var obj;
+        let obj;
         if (!err) {
             obj = {};
             dps.forEach((dp, index) => {
@@ -240,20 +255,20 @@ function pollPuff() {
 
         if (++pc > 50) {
             pc = 0;
-            setTimeout(pollSettings, 25);
+            setTimeout(pollSettings, 12);
         } else {
-            setTimeout(pollPuff, 25);
+            setTimeout(pollPuff, 12);
         }
 
     });
 }
 
-var pollSettingsDatapoints = ['TSP', 'PSP', 'R', 'B'];
+
 
 
 function pollSettings() {
-    var dps = [];
-    var cmdQueue = [];
+    let dps = [];
+    let cmdQueue = [];
     pollSettingsDatapoints.forEach(dp => {
         if (running && dp === 'B') return;
         dps.push(dp.substr(0, 1));
@@ -278,27 +293,13 @@ function pollSettings() {
             ipcSend('setpoints', obj);
 
         }
-        setTimeout(pollPuff, 100);
+        setTimeout(pollPuff, 5);
     });
 }
 
 function pollInfos() {
-    var pollInfosDatapoints = [
-        ['E', 'MFR'],
-        ['E', 'PRODUCT'],
-        ['B', 'CELLS'],
-        ['E', 'FEATURE 1'],
-        ['E', 'FEATURE 2'],
-        ['E', 'FEATURE 3'],
-        ['E', 'FEATURE 4'],
-        ['E', 'FEATURE 5'],
-        ['E', 'FEATURE 6'],
-        ['E', 'FEATURE 7'],
-        ['E', 'FEATURE 8'],
-        ['E', 'FEATURE 9']
-    ];
-    var dps = [];
-    var cmdQueue = [];
+    let dps = [];
+    let cmdQueue = [];
     pollInfosDatapoints.forEach(dp => {
         dps.push(dp);
         cmdQueue.push(cb => {
