@@ -5,6 +5,12 @@ body {
 
 }
 
+body.modal {
+    background-color: #333;
+    color: #eee;
+    padding: 12px;
+}
+
 #chart {
     height: calc(100% - 120px);
 }

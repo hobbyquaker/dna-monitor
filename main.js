@@ -16,6 +16,8 @@ const async =               require('async');
 const SerialPort =          require('serialport');
 
 let mainWindow;
+let serialConsoleWindow;
+let statisticsWindow;
 let debug;
 let port = null;
 let callbacks = {};
@@ -95,6 +97,9 @@ function createWindow () {
         if (port) port.close();
         process.exit(0);
     });
+
+
+
 }
 
 app.on('ready', createWindow);
@@ -345,11 +350,13 @@ var menuTemplate = [
         submenu: [
             {
                 role: 'statistics',
-                label: 'Statistics'
+                label: 'Statistics',
+                click() { statistics(); }
             },
             {
                 role: 'serial console',
-                label: 'Serial Console'
+                label: 'Serial Console',
+                click() { serialConsole(); }
             },
             {
                 role: 'export',
@@ -409,7 +416,7 @@ if (process.platform === 'darwin') {
 }
 
 function exportCsv() {
-    dialog.showSaveDialog({
+    dialog.showSaveDialog(mainWindow, {
         title: 'Export csv',
         filters: [
             {name: 'Comma seperated values', extensions: ['csv']}
@@ -419,3 +426,36 @@ function exportCsv() {
     });
 }
 
+function serialConsole() {
+    serialConsoleWindow = new BrowserWindow({
+        width: 600,
+        height: 500,
+        show: false,
+        modal: true,
+        parent: mainWindow
+    });
+    serialConsoleWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'console.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+
+    serialConsoleWindow.show();
+}
+
+function statistics() {
+    statisticsWindow = new BrowserWindow({
+        width: 600,
+        height: 500,
+        show: false,
+        modal: true,
+        parent: mainWindow
+    });
+    statisticsWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'statistics.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+    statisticsWindow.show();
+
+}
