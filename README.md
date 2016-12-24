@@ -47,6 +47,12 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 * [ ] Linux support
 
 
+### Serial commands
+
+If you want to build your own software that communicates with DNA chipsets via the serial interface this could be 
+helpful: https://github.com/hobbyquaker/dna-commands
+
+
 ### Credits
 
 This software uses [Highcharts](http://www.highcharts.com/) which is free for non-commercial use.
