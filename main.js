@@ -1,25 +1,26 @@
 const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
-
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
 const async = require('async');
 const SerialPort = require('serialport');
 const ipc = require('electron').ipcMain;
-
+const storage = require('electron-json-storage');
 const windowStateKeeper = require('electron-window-state');
-let mainWindow;
-
 const isDev = require('electron-is-dev');
-var debug;
+
+let mainWindow;
+let debug;
 
 if (isDev) {
     debug = console.log;
 } else {
     debug = function () {};
 }
+
+var pollPuffDatapoints =  ['T', 'P'];
 
 function createWindow () {
 
@@ -47,9 +48,17 @@ function createWindow () {
     // let's go!
     setTimeout(() => {
         findport(start);
+
+        storage.get('datapoints', (err, data) => {
+            if (!err) {
+                pollPuffDatapoints = data;
+                ipcSend('series', data);
+            }
+        });
+
     }, 1000);
 
-    mainWindowState.manage(mainWindow);
+    if (!isDev) mainWindowState.manage(mainWindow);
 
     mainWindow.on('closed', () => {
         mainWindow = null;
@@ -172,7 +181,7 @@ function ipcSend(key, data) {
     if (mainWindow) {
         mainWindow.webContents.send(key, data);
     } else {
-        port.close();
+        if (port) port.close();
         process.exit(0);
     }
 }
@@ -193,9 +202,10 @@ ipc.on('fire', (e, val) => {
 var running;
 var pc = 50;
 
-var pollPuffDatapoints = ['T', 'P'];
+
 
 ipc.on('datapoints', (e, val) => {
+    storage.set('datapoints', val);
     pollPuffDatapoints = val;
 });
 

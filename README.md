@@ -24,7 +24,7 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 * [x] Support Degree Farenheit
 * [x] Catch errors if no serialport available
 * [x] Vertical resize of chart on window resizing
-* [ ] Persist settings
+* [x] Persist settings
 * [ ] Menu
 * [ ] CSV export
 * [ ] Option to keep data of preceding puffs

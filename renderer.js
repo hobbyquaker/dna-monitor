@@ -420,6 +420,14 @@ $(document).ready(() => {
         ipc.send('datapoints', visibleAxis);
     }
 
+    ipc.on('series', (event, data) => {
+        chart.series.forEach(serie => {
+            if (data.indexOf(axisNames[serie.name]) !== -1) {
+                serie.show();
+            }
+        });
+    });
+
 
 });
 
