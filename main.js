@@ -24,6 +24,7 @@ let callbacks = {};
 let running;
 let pc = 50;
 let features;
+let pollPause;
 
 let pollPuffDatapoints =  ['T', 'P'];
 let pollSettingsDatapoints = ['TSP', 'PSP', 'R', 'B'];
@@ -95,7 +96,7 @@ function createWindow () {
     mainWindow.on('closed', () => {
         mainWindow = null;
         if (port) port.close();
-        process.exit(0);
+        app.quit();
     });
 
 
@@ -241,6 +242,7 @@ ipc.on('datapoints', (e, val) => {
 });
 
 function pollPuff() {
+    if (pollPause) return;
     let dps = [];
     let cmdQueue = [];
     pollPuffDatapoints.forEach(dp => {
@@ -427,6 +429,7 @@ function exportCsv() {
 }
 
 function serialConsole() {
+    pollPause = true;
     serialConsoleWindow = new BrowserWindow({
         width: 600,
         height: 500,
@@ -441,12 +444,20 @@ function serialConsole() {
     }));
 
     serialConsoleWindow.show();
+    console.log('console');
+    statisticsWindow.on('closed', () => {
+        statisticsWindow = null;
+        console.log('console closed');
+        pollPause = false;
+        pollPuff();
+    });
 }
 
 function statistics() {
+    pollPause = true;
     statisticsWindow = new BrowserWindow({
-        width: 600,
-        height: 500,
+        width: 700,
+        height: 524,
         show: false,
         modal: true,
         parent: mainWindow
@@ -458,4 +469,88 @@ function statistics() {
     }));
     statisticsWindow.show();
 
+
+
+    setTimeout(() => {
+        pollStatistics(data => {
+            statisticsWindow.webContents.send('statistics', data);
+        });
+
+    }, 200);
+
+    statisticsWindow.on('closed', () => {
+        statisticsWindow = null;
+        pollPause = false;
+        pollPuff();
+    });
+}
+
+var pollStatisticsDatapoints = [
+    'LASTENERGY',
+    'LASTPOWER',
+    'LASTTEMP',
+    'LASTPOWER',
+    'LASTPEAKTEMP',
+    'PUFFS',
+    'DEVICE PUFFS',
+    'TEMP PUFFS',
+    'DEVICE TEMP PUFFS',
+    'RESETS',
+    'ENERGY',
+    'MEAN ENERGY',
+    'SD ENERGY',
+    'DEVICE ENERGY',
+    'DEVICE MEAN ENERGY',
+    'DEVICE SD ENERGY',
+    'POWER',
+    'MEAN POWER',
+    'SD POWER',
+    'DEVICE POWER',
+    'DEVICE MEAN POWER',
+    'DEVICE SD POWER',
+    'TEMP',
+    'MEAN TEMP',
+    'SD TEMP',
+    'DEVICE TEMP',
+    'DEVICE MEAN TEMP',
+    'DEVICE SD TEMP',
+    'PEAK TEMP',
+    'MEAN PEAK TEMP',
+    'SD PEAK TEMP',
+    'DEVICE PEAK TEMP',
+    'DEVICE MEAN PEAK TEMP',
+    'DEVICE SD PEAK TEMP',
+    'TIME',
+    'MEAN TIME',
+    'SD TIME',
+    'DEVICE TIME',
+    'DEVICE MEAN TIME',
+    'DEVICE SD TIME',
+    'LAST TIME'
+];
+
+function pollStatistics(callback) {
+    let dps = [];
+    let cmdQueue = [];
+    pollStatisticsDatapoints.forEach(dp => {
+        dps.push('S');
+        cmdQueue.push(cb => {
+
+            cmdGet('S', dp, (err, res) => {
+                setTimeout(() => {
+                    cb(null, res);
+                }, 20);
+
+            });
+        });
+    });
+    async.series(cmdQueue, (err, res) => {
+        let obj = {};
+        if (!err) {
+            dps.forEach((dp, index) => {
+                obj[pollStatisticsDatapoints[index]] = res[index];
+            });
+        }
+        callback(obj);
+    });
 }

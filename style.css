@@ -11,6 +11,26 @@ body.modal {
     padding: 12px;
 }
 
+table.statistics {
+    display: inline-block;
+    width: 320px;
+}
+
+table.statistics tr td {
+    background-color: #333;
+    color: #eee;
+    font-size: 11px;
+
+}
+
+td.desc {
+    width: 120px;
+}
+
+td.val {
+    width: 190px;
+}
+
 #chart {
     height: calc(100% - 120px);
 }
