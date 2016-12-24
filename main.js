@@ -444,10 +444,8 @@ function serialConsole() {
     }));
 
     serialConsoleWindow.show();
-    console.log('console');
     statisticsWindow.on('closed', () => {
         statisticsWindow = null;
-        console.log('console closed');
         pollPause = false;
         pollPuff();
     });
