@@ -11,8 +11,19 @@ const ipc = require('electron').ipcMain;
 
 let mainWindow;
 
+const isDev = require('electron-is-dev');
+var debug;
+
+if (isDev) {
+    console.log('Running in development');
+    debug = console.log;
+} else {
+    debug = function () {};
+    console.log('Running in production');
+}
+
 function createWindow () {
-    mainWindow = new BrowserWindow({width: 860, height: 540});
+    mainWindow = new BrowserWindow({width: isDev ? 1280 : 860, height: 540});
 
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
@@ -21,7 +32,7 @@ function createWindow () {
     }));
 
     // Open the DevTools.
-    //mainWindow.webContents.openDevTools();
+    if (isDev) mainWindow.webContents.openDevTools();
 
     // let's go!
     setTimeout(() => {
