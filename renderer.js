@@ -124,7 +124,6 @@ var degreeVal;
 var degreeChange;
 
 ipc.on('setpoints', (event, data) => {
-    console.log('setpoints', data);
     var p = parseFloat(data.P.replace('W', ''));
     if (setpVal !== p) {
         setpVal = p;
