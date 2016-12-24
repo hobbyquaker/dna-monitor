@@ -9,21 +9,31 @@ const async = require('async');
 const SerialPort = require('serialport');
 const ipc = require('electron').ipcMain;
 
+const windowStateKeeper = require('electron-window-state');
 let mainWindow;
 
 const isDev = require('electron-is-dev');
 var debug;
 
 if (isDev) {
-    console.log('Running in development');
     debug = console.log;
 } else {
     debug = function () {};
-    console.log('Running in production');
 }
 
 function createWindow () {
-    mainWindow = new BrowserWindow({width: isDev ? 1280 : 860, height: 540});
+
+    let mainWindowState = windowStateKeeper({
+        defaultWidth: 860,
+        defaultHeight: 540
+    });
+
+    let devWindowState = {
+        width: 1280,
+        height: 540
+    };
+
+    mainWindow = new BrowserWindow(isDev ? devWindowState : mainWindowState);
 
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
@@ -38,6 +48,8 @@ function createWindow () {
     setTimeout(() => {
         findport(start);
     }, 1000);
+
+    mainWindowState.manage(mainWindow);
 
     mainWindow.on('closed', () => {
         mainWindow = null;
@@ -71,6 +83,7 @@ function findport(cb) {
         }
     }
     if (sport) {
+        debug('found port', sport);
         cb(sport)
     } else {
         setTimeout(() => {
@@ -81,9 +94,11 @@ function findport(cb) {
 
 
 function start(sport) {
+
     port = new SerialPort(sport);
 
     port.on('open', () => {
+        debug('opened', sport);
         mainWindow.webContents.send('sport', true);
         setTimeout(pollInfos, 100);
 
@@ -133,7 +148,7 @@ function cmdGet(dp, mod, cb) {
                     callbacks[dp] = cb;
                     setTimeout(() => {
                         if (port && callbacks[dp]) {
-                            //console.log('timeout', dp);
+                            debug('timeout', dp);
                             cb(new Error('timeout'));
                             delete callbacks[dp];
                         }
