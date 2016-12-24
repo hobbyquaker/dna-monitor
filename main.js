@@ -57,13 +57,17 @@ function createWindow () {
         height: 540
     };
 
-    mainWindow = new BrowserWindow(isDev ? devWindowState : mainWindowState);
+    let windowState = isDev ? devWindowState : mainWindowState;
+
+    mainWindow = new BrowserWindow(windowState);
 
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
     }));
+
+
 
     if (isDev) mainWindow.webContents.openDevTools();
 
@@ -81,6 +85,9 @@ function createWindow () {
     }, 1000);
 
     if (!isDev) mainWindowState.manage(mainWindow);
+
+    const menu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(menu);
 
     mainWindow.on('closed', () => {
         mainWindow = null;
@@ -128,7 +135,7 @@ function start(sport) {
     port.on('open', () => {
         debug('opened', sport);
         mainWindow.webContents.send('sport', true);
-        setTimeout(pollInfos, 100);
+        setTimeout(pollInfos, 50);
 
     });
 
@@ -149,8 +156,7 @@ function start(sport) {
             delete callbacks[datapoint];
             setTimeout(() => {
                 cb(null, value);
-            }, 1);
-
+            }, 4);
         }
     });
 }
@@ -181,7 +187,7 @@ function cmdGet(dp, mod, cb) {
                             cb(new Error('timeout'));
                             delete callbacks[dp];
                         }
-                    }, 10);
+                    }, 12);
                 }
             }
         });
@@ -256,9 +262,9 @@ function pollPuff() {
 
         if (++pc > 50) {
             pc = 0;
-            setTimeout(pollSettings, 12);
+            setTimeout(pollSettings, 15);
         } else {
-            setTimeout(pollPuff, 12);
+            setTimeout(pollPuff, 15);
         }
 
     });
@@ -329,3 +335,74 @@ function pollInfos() {
         setTimeout(pollSettings, 100);
     });
 }
+
+
+var menuTemplate = [
+    {
+
+        label: 'Tools',
+        submenu: [
+            {
+                role: 'statistics',
+                label: 'Statistics'
+            },
+            {
+                role: 'serial console',
+                label: 'Serial Console'
+            },
+            {
+                role: 'export',
+                label: 'Export csv'
+            }
+        ]
+    },
+    {
+        label: 'Settings',
+        submenu: [
+            {
+                label: 'Clear chart on every puff',
+                type: 'checkbox',
+                checked: true
+            }
+        ]
+    }
+
+];
+if (process.platform === 'darwin') {
+    menuTemplate.unshift({
+        label: 'DNA Monitor',
+        submenu: [
+            {
+                role: 'about',
+                label: 'About DNA Monitor'
+            },
+            {
+                type: 'separator'
+            },
+            {
+                role: 'services',
+                submenu: []
+            },
+            {
+                type: 'separator'
+            },
+            {
+                role: 'hide'
+            },
+            {
+                role: 'hideothers'
+            },
+            {
+                role: 'unhide'
+            },
+            {
+                type: 'separator'
+            },
+            {
+                role: 'quit'
+            }
+        ]
+    });
+
+}
+
