@@ -1,7 +1,33 @@
-const ipc = require('electron').ipcRenderer;
-const $ = jQuery = require('jquery');
-const Highcharts = require('highcharts');
+const ipc =         require('electron').ipcRenderer;
+const $ = jQuery =  require('jquery');
+const Highcharts =  require('highcharts');
 require('highcharts/themes/gray.js')(Highcharts);
+
+let running;
+let degreeunit;
+let start;
+let maxPower;
+let maxTemperature;
+let riseTime;
+let elapsed;
+
+let visibleAxis = ['P', 'T'];
+
+let setpVal;
+let setpChange;
+let settVal;
+let settChange;
+let degreeVal;
+let degreeChange;
+let series;
+let chart;
+
+let axisNames = {
+    'Current': 'I',
+    'Resistance': 'RLIVE',
+    'Voltage': 'V',
+    'Battery': 'B'
+};
 
 ipc.on('sport', function (event, data) {
     if (data) {
@@ -17,16 +43,6 @@ ipc.on('sport', function (event, data) {
         chart.redraw();
     }
 });
-
-let running;
-let degreeunit;
-let start;
-let maxPower;
-let maxTemperature;
-let riseTime;
-let elapsed;
-
-let visibleAxis = ['P', 'T'];
 
 ipc.on('infos', (event, data) => {
     $('#infos').html((data.MFR !== '?' ? data.MFR + ' ' : '') + data.PRODUCT + ', ' + data.CELLS + ' battery cell' + (data.CELLS > 1 ? 's' : '') + ', ' + data.FEATURES.join(', '));
@@ -115,13 +131,6 @@ ipc.on('values', (event, data) => {
     }
 });
 
-let setpVal;
-let setpChange;
-let settVal;
-let settChange;
-let degreeVal;
-let degreeChange;
-
 ipc.on('setpoints', (event, data) => {
     let p = parseFloat(data.P.replace('W', ''));
     if (setpVal !== p) {
@@ -207,8 +216,7 @@ $('#fire').click(() => {
     ipc.send('fire', $('#duration').val());
 });
 
-let series;
-let chart;
+
 $(document).ready(() => {
     chart = new Highcharts.Chart({
         chart: {
@@ -401,13 +409,6 @@ $(document).ready(() => {
 
         ]
     });
-
-    let axisNames = {
-        'Current': 'I',
-        'Resistance': 'RLIVE',
-        'Voltage': 'V',
-        'Battery': 'B'
-    };
 
     function toggleAxis(name, visible) {
         name = axisNames[name];
