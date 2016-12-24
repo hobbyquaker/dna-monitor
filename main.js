@@ -1,15 +1,18 @@
-const electron = require('electron');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
-const path = require('path');
-const url = require('url');
-const fs = require('fs');
-const async = require('async');
-const SerialPort = require('serialport');
-const ipc = require('electron').ipcMain;
-const storage = require('electron-json-storage');
-const windowStateKeeper = require('electron-window-state');
-const isDev = require('electron-is-dev');
+const electron =            require('electron');
+const app =                 electron.app;
+const Menu =                electron.Menu;
+const ipc =                 electron.ipcMain;
+const BrowserWindow =       electron.BrowserWindow;
+
+const storage =             require('electron-json-storage');
+const windowStateKeeper =   require('electron-window-state');
+const isDev =               require('electron-is-dev');
+
+const path =                require('path');
+const url =                 require('url');
+const fs =                  require('fs');
+const async =               require('async');
+const SerialPort =          require('serialport');
 
 let mainWindow;
 let debug;
