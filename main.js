@@ -354,7 +354,7 @@ var menuTemplate = [
                 role: 'statistics',
                 label: 'Statistics',
                 click() { statistics(); }
-            },
+            }/*,
             {
                 role: 'serial console',
                 label: 'Serial Console',
@@ -364,9 +364,9 @@ var menuTemplate = [
                 role: 'export',
                 label: 'Export csv',
                 click() { exportCsv(); }
-            }
+            }*/
         ]
-    },
+    }/*,
     {
         label: 'Settings',
         submenu: [
@@ -376,7 +376,7 @@ var menuTemplate = [
                 checked: true
             }
         ]
-    }
+    }*/
 
 ];
 if (process.platform === 'darwin') {
