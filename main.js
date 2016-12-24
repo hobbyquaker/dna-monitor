@@ -20,6 +20,7 @@ let port = null;
 let callbacks = {};
 let running;
 let pc = 50;
+let features;
 
 let pollPuffDatapoints =  ['T', 'P'];
 let pollSettingsDatapoints = ['TSP', 'PSP', 'R', 'B'];
@@ -201,7 +202,7 @@ function ipcSend(key, data) {
         mainWindow.webContents.send(key, data);
     } else {
         if (port) port.close();
-        process.exit(0);
+        app.quit();
     }
 }
 
@@ -321,6 +322,9 @@ function pollInfos() {
                 }
             });
             ipcSend('infos', obj);
+            if (obj.FEATURES.indexOf('FG') !== -1) {
+                //pollSettingsDatapoints.push('CGET%');
+            }
         }
         setTimeout(pollSettings, 100);
     });
