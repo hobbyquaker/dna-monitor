@@ -170,6 +170,18 @@ ipc.on('setpoints', (event, data) => {
 
 });
 
+ipc.on('csv', (event) => {
+    let obj = {};
+    chart.series.forEach((serie, sidx) => {
+        serie.data.forEach(point => {
+            if (!obj[point.x]) obj[point.x] = {};
+            obj[point.x][serie.name] = point.y;
+        });
+    });
+
+    ipc.send('csvdata', obj);
+});
+
 $('#setp').click(() => {
     ipc.send('setp', $('#psp').val());
     setTimeout(() => {

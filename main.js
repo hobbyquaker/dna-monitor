@@ -214,7 +214,7 @@ function ipcSend(key, data) {
     if (mainWindow) {
         mainWindow.webContents.send(key, data);
     } else {
-        if (port) port.close();
+        //if (port) port.close();
         app.quit();
     }
 }
@@ -354,17 +354,18 @@ var menuTemplate = [
                 role: 'statistics',
                 label: 'Statistics',
                 click() { statistics(); }
+            },
+            {
+                role: 'export',
+                label: 'Export csv',
+                click() { exportCsv(); }
             }/*,
             {
                 role: 'serial console',
                 label: 'Serial Console',
                 click() { serialConsole(); }
             },
-            {
-                role: 'export',
-                label: 'Export csv',
-                click() { exportCsv(); }
-            }*/
+            */
         ]
     }/*,
     {
@@ -417,6 +418,8 @@ if (process.platform === 'darwin') {
 
 }
 
+let csvFile;
+
 function exportCsv() {
     dialog.showSaveDialog(mainWindow, {
         title: 'Export csv',
@@ -425,8 +428,31 @@ function exportCsv() {
         ]
     }, function (filename) {
         debug('export', filename);
+        csvFile = filename;
+        ipcSend('csv');
     });
 }
+
+ipc.on('csvdata', function (event, data) {
+    debug('received export data', data.length);
+    let lines = [['time']];
+    Object.keys(data[Object.keys(data)[0]]).forEach(dp => {
+        lines[0].push(dp);
+    });
+    Object.keys(data).forEach(ts => {
+        let line = [ts];
+        Object.keys(data[ts]).forEach(dp => {
+            line.push(data[ts][dp]);
+        });
+        lines.push(line);
+    });
+    lines.forEach((line, index) => {
+        lines[index] = line.join(';');
+    });
+    let csv = lines.join('\r\n');
+    debug('write', csvFile);
+    fs.writeFile(csvFile, csv);
+});
 
 function serialConsole() {
     pollPause = true;

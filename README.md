@@ -25,8 +25,8 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 * [x] Catch errors if no serialport available
 * [x] Vertical resize of chart on window resizing
 * [x] Persist settings
-* [ ] Menu
-* [ ] CSV export
+* [x] Menu
+* [x] CSV export
 * [ ] Option to keep data of preceding puffs
 * [x] Show last puffs duration and max temperature
 * [ ] Build job with automatic tagging, electron-packager and github release
