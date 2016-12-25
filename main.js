@@ -18,6 +18,7 @@ const SerialPort =          require('serialport');
 let mainWindow;
 let serialConsoleWindow;
 let statisticsWindow;
+let menu;
 let debug;
 let port = null;
 let callbacks = {};
@@ -27,6 +28,7 @@ let features;
 let pollPause;
 let serialConsoleActive;
 let retainPuffs;
+
 
 let pollPuffDatapoints =  ['T', 'P'];
 let pollSettingsDatapoints = ['TSP', 'PSP', 'R', 'B'];
@@ -77,6 +79,9 @@ function createWindow () {
 
     if (isDev) mainWindow.webContents.openDevTools();
 
+    menu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(menu);
+
     // let's go!
     setTimeout(() => {
         findport(start);
@@ -102,8 +107,7 @@ function createWindow () {
 
     if (!isDev) mainWindowState.manage(mainWindow);
 
-    const menu = Menu.buildFromTemplate(menuTemplate);
-    Menu.setApplicationMenu(menu);
+
 
     mainWindow.on('closed', () => {
         mainWindow = null;
@@ -162,11 +166,16 @@ function start(sport) {
         debug('opened', sport);
         mainWindow.webContents.send('sport', true);
         setTimeout(pollInfos, 50);
+        menu.items[1].submenu.items[0].enabled = true;
+        menu.items[1].submenu.items[2].enabled = true;
+
 
     });
 
     port.on('disconnect', () => {
         debug('disconnect', sport);
+        menu.items[1].submenu.items[0].enabled = false;
+        menu.items[1].submenu.items[2].enabled = false;
         port = null;
         callbacks = {};
         mainWindow.webContents.send('sport', false);
@@ -379,16 +388,19 @@ var menuTemplate = [
             {
                 role: 'statistics',
                 label: 'Statistics',
+                enabled: false,
                 click() { statistics(); }
             },
             {
                 role: 'export',
                 label: 'Export csv',
+                enabled: false,
                 click() { exportCsv(); }
             },
             {
                 role: 'serial console',
                 label: 'Serial Console',
+                enabled: false,
                 click() { serialConsole(); }
             }
         ]
