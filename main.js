@@ -91,6 +91,90 @@ let pollStatisticsDatapoints = [
     'LAST TIME'
 ];
 
+let menuItemRetain;
+let menuItemStatistics;
+let menuItemConsole;
+let menuItemCsv;
+let menuTemplate = [
+    {
+
+        label: 'Tools',
+        submenu: [
+            {
+                role: 'statistics',
+                label: 'Statistics',
+                enabled: false,
+                click() { statistics(); }
+            },
+            {
+                role: 'export',
+                label: 'Export csv',
+                enabled: false,
+                click() { exportCsv(); }
+            },
+            {
+                role: 'serial console',
+                label: 'Serial Console',
+                enabled: false,
+                click() { serialConsole(); }
+            }
+        ]
+    },
+    {
+        label: 'Settings',
+        submenu: [
+            {
+                label: 'Clear chart on every puff',
+                type: 'checkbox',
+                checked: true,
+                click(menuItem) {
+                    retainPuffs = !menuItem.checked;
+                    storage.set('retain', retainPuffs);
+                    ipcSend('retain', retainPuffs);
+                }
+            }
+        ]
+    }
+
+];
+
+if (process.platform === 'darwin') {
+    menuTemplate.unshift({
+        label: 'DNA Monitor',
+        submenu: [
+            {
+                role: 'about',
+                label: 'About DNA Monitor'
+            },
+            {
+                type: 'separator'
+            },
+            {
+                role: 'services',
+                submenu: []
+            },
+            {
+                type: 'separator'
+            },
+            {
+                role: 'hide'
+            },
+            {
+                role: 'hideothers'
+            },
+            {
+                role: 'unhide'
+            },
+            {
+                type: 'separator'
+            },
+            {
+                role: 'quit'
+            }
+        ]
+    });
+}
+
 if (isDev) {
     debug = console.log;
 } else {
@@ -119,11 +203,22 @@ function createWindow () {
         slashes: true
     }));
 
-
-
     if (isDev) mainWindow.webContents.openDevTools();
 
     menu = Menu.buildFromTemplate(menuTemplate);
+
+    if (process.platform === 'darwin') {
+        menuItemStatistics =    menu.items[1].submenu.items[0];
+        menuItemCsv =           menu.items[1].submenu.items[1];
+        menuItemConsole =       menu.items[1].submenu.items[2];
+        menuItemRetain =        menu.items[2].submenu.items[0];
+    } else {
+        menuItemStatistics =    menu.items[0].submenu.items[0];
+        menuItemCsv =           menu.items[0].submenu.items[1];
+        menuItemConsole =       menu.items[0].submenu.items[2];
+        menuItemRetain =        menu.items[1].submenu.items[0];
+    }
+
     Menu.setApplicationMenu(menu);
 
     // let's go!
@@ -137,7 +232,7 @@ function createWindow () {
             }
             ipcSend('retain', retainPuffs);
 
-            menu.items[2].submenu.items[0].checked = !retainPuffs;
+            menuItemRetain.checked = !retainPuffs;
         });
 
         storage.get('datapoints', (err, data) => {
@@ -151,16 +246,11 @@ function createWindow () {
 
     if (!isDev) mainWindowState.manage(mainWindow);
 
-
-
     mainWindow.on('closed', () => {
         mainWindow = null;
         if (port) port.close();
         app.quit();
     });
-
-
-
 }
 
 app.on('ready', createWindow);
@@ -215,15 +305,16 @@ function start(sport) {
         debug('opened', sport);
         mainWindow.webContents.send('sport', true);
         setTimeout(pollInfos, 50);
-        menu.items[1].submenu.items[0].enabled = true;
-        menu.items[1].submenu.items[2].enabled = true;
+        menuItemStatistics.enabled =    true;
+        menuItemConsole.enabled =       true;
     });
 
     port.on('disconnect', () => {
         debug('disconnect', sport);
-        menu.items[1].submenu.items[0].enabled = false;
-        menu.items[1].submenu.items[1].enabled = false;
-        menu.items[1].submenu.items[2].enabled = false;
+        menuItemStatistics.enabled =    false;
+        menuItemRetain.enabled =        false;
+        menuItemConsole.enabled =       false;
+        menuItemCsv.enabled =           false;
         port = null;
         callbacks = {};
         mainWindow.webContents.send('sport', false);
@@ -373,7 +464,7 @@ function pollPuff() {
             dps.forEach((dp, index) => {
                 if (dp === 'P' && res[index] !== '?' && !running) {
                     running = true;
-                    if (!menu.items[1].submenu.items[1].enabled) menu.items[1].submenu.items[1].enabled = true;
+                    if (!menuItemCsv.enabled) menuItemCsv.enabled = true;
 
                 } else if (dp === 'P' && res[index] === '?' && running) {
                     running = false;
@@ -459,89 +550,6 @@ function pollInfos() {
     });
 }
 
-
-var menuTemplate = [
-    {
-
-        label: 'Tools',
-        submenu: [
-            {
-                role: 'statistics',
-                label: 'Statistics',
-                enabled: false,
-                click() { statistics(); }
-            },
-            {
-                role: 'export',
-                label: 'Export csv',
-                enabled: false,
-                click() { exportCsv(); }
-            },
-            {
-                role: 'serial console',
-                label: 'Serial Console',
-                enabled: false,
-                click() { serialConsole(); }
-            }
-        ]
-    },
-    {
-        label: 'Settings',
-        submenu: [
-            {
-                label: 'Clear chart on every puff',
-                type: 'checkbox',
-                checked: true,
-                click(menuItem) {
-                    retainPuffs = !menuItem.checked;
-                    storage.set('retain', retainPuffs);
-                    ipcSend('retain', retainPuffs);
-                }
-            }
-        ]
-    }
-
-];
-if (process.platform === 'darwin') {
-    menuTemplate.unshift({
-        label: 'DNA Monitor',
-        submenu: [
-            {
-                role: 'about',
-                label: 'About DNA Monitor'
-            },
-            {
-                type: 'separator'
-            },
-            {
-                role: 'services',
-                submenu: []
-            },
-            {
-                type: 'separator'
-            },
-            {
-                role: 'hide'
-            },
-            {
-                role: 'hideothers'
-            },
-            {
-                role: 'unhide'
-            },
-            {
-                type: 'separator'
-            },
-            {
-                role: 'quit'
-            }
-        ]
-    });
-
-}
-
-
-
 function exportCsv() {
     dialog.showSaveDialog(mainWindow, {
         title: 'Export csv',
@@ -598,8 +606,6 @@ function statistics() {
     }));
     statisticsWindow.show();
 
-
-
     setTimeout(() => {
         pollStatistics(data => {
             statisticsWindow.webContents.send('statistics', data);
@@ -613,8 +619,6 @@ function statistics() {
         pollPuff();
     });
 }
-
-
 
 function pollStatistics(callback) {
     let dps = [];
@@ -641,6 +645,3 @@ function pollStatistics(callback) {
         callback(obj);
     });
 }
-
-
-
