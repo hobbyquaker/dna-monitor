@@ -168,8 +168,6 @@ function start(sport) {
         setTimeout(pollInfos, 50);
         menu.items[1].submenu.items[0].enabled = true;
         menu.items[1].submenu.items[2].enabled = true;
-
-
     });
 
     port.on('disconnect', () => {
@@ -295,6 +293,8 @@ function pollPuff() {
             dps.forEach((dp, index) => {
                 if (dp === 'P' && res[index] !== '?' && !running) {
                     running = true;
+                    if (!menu.items[1].submenu.items[1].enabled) menu.items[1].submenu.items[1].enabled = true;
+
                 } else if (dp === 'P' && res[index] === '?' && running) {
                     running = false;
                 }
