@@ -19,36 +19,6 @@ progress.
 Connect your DNA Device to your Mac, start the Application, vape on.
 
 
-### Todo
-
-* [x] Support Degree Farenheit
-* [x] Catch errors if no serialport available
-* [x] Vertical resize of chart on window resizing
-* [x] Persist settings
-* [x] Menu
-* [x] CSV export
-* [ ] Option to keep data of preceding puffs
-* [x] Show last puffs duration and max temperature
-* [ ] Build job with automatic tagging, electron-packager and github release
-* [x] Show more values: Battery Voltage
-* [x] Show more values: Current
-* [x] Show more values: Resistance
-* [x] Show more values: Voltage
-* [ ] Show more values: Device temperature
-* [ ] Show more stats: Max battery voltage drop
-* [x] Show more Infos: Device manufactor, type, features
-* [x] Show more Infos: Cold resistance
-* [x] Show more Infos: Battery voltage
-* [ ] Show more Infos: Battery level percentage
-* [x] Detailed statistics
-* [ ] Show current profile
-* [ ] Change current profile
-* [x] Hit fire button
-* [ ] Serial command console
-* [ ] App icon
-* [ ] Linux support
-
-
 ### Serial commands
 
 If you want to build your own software that communicates with DNA chipsets via the serial interface this could be 
@@ -57,7 +27,7 @@ helpful: https://github.com/hobbyquaker/dna-commands
 
 ### Credits
 
-This software uses [Highcharts](http://www.highcharts.com/) which is free for non-commercial use.
+This software uses [Highcharts](http://www.highcharts.com/) which is free only for non-commercial use.
 
 
 ### License
