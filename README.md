@@ -5,8 +5,7 @@
 ![Screenshot](screenshot.png "Screenshot")
 
 
-This tool can't - and will never - replace the Escribe software, it's just the device-monitoring part and still work in 
-progress.
+This tool can't - and will never - replace the Escribe software, it's just the device-monitoring part.
 
 
 ### Download
