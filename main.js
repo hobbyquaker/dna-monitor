@@ -329,9 +329,13 @@ ipc.on('csvdata', function (event, data) {
         lines[0].push(dp);
         columns[dp] = i++;
     });
-    Object.keys(data).forEach(ts => {
+    Object.keys(data).sort().forEach(ts => {
         let line = [ts];
         Object.keys(data[ts]).forEach(dp => {
+            if (!columns[dp]) {
+                columns[dp] = i++;
+                lines[0].push(dp);
+            }
             line[columns[dp]] = data[ts][dp];
         });
         lines.push(line);
