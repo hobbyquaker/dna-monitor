@@ -324,7 +324,6 @@ function start(sport) {
     });
 
     port.on('data', data => {
-
         if (!serialConsoleActive) {
             let [datapoint, value] = data.toString().replace(/\r\n$/, '').split('=');
             if (callbacks[datapoint]) {
@@ -337,8 +336,6 @@ function start(sport) {
         } else {
             serialConsoleWindow.webContents.send('response', data);
         }
-
-
     });
 }
 
@@ -373,7 +370,6 @@ function cmdGet(dp, mod, cb) {
             }
         });
     }
-
 }
 
 function cmdSet(dp, val, cb) {
@@ -444,7 +440,6 @@ ipc.on('csvdata', function (event, data) {
     fs.writeFile(csvFile, csv);
 });
 
-
 function pollPuff() {
     if (pollPause) return;
     let dps = [];
@@ -483,9 +478,6 @@ function pollPuff() {
 
     });
 }
-
-
-
 
 function pollSettings() {
     let dps = [];
