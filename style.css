@@ -89,3 +89,17 @@ td.val {
     padding-top: 4px;
     height: 56px;
 }
+
+#output {
+    width: 560px;
+    height: 370px;
+    overflow-y: scroll;
+}
+
+#input {
+    color: #111;
+}
+
+#console {
+    padding-bottom: 6px;
+}

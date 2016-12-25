@@ -25,6 +25,7 @@ let running;
 let pc = 50;
 let features;
 let pollPause;
+let serialConsoleActive;
 
 let pollPuffDatapoints =  ['T', 'P'];
 let pollSettingsDatapoints = ['TSP', 'PSP', 'R', 'B'];
@@ -157,14 +158,21 @@ function start(sport) {
     });
 
     port.on('data', data => {
-        let [datapoint, value] = data.toString().replace(/\r\n$/, '').split('=');
-        if (callbacks[datapoint]) {
-            let cb = callbacks[datapoint];
-            delete callbacks[datapoint];
-            setTimeout(() => {
-                cb(null, value);
-            }, 4);
+
+        if (!serialConsoleActive) {
+            let [datapoint, value] = data.toString().replace(/\r\n$/, '').split('=');
+            if (callbacks[datapoint]) {
+                let cb = callbacks[datapoint];
+                delete callbacks[datapoint];
+                setTimeout(() => {
+                    cb(null, value);
+                }, 4);
+            }
+        } else {
+            serialConsoleWindow.webContents.send('response', data);
         }
+
+
     });
 }
 
@@ -359,13 +367,12 @@ var menuTemplate = [
                 role: 'export',
                 label: 'Export csv',
                 click() { exportCsv(); }
-            }/*,
+            },
             {
                 role: 'serial console',
                 label: 'Serial Console',
                 click() { serialConsole(); }
-            },
-            */
+            }
         ]
     }/*,
     {
@@ -456,8 +463,9 @@ ipc.on('csvdata', function (event, data) {
 
 function serialConsole() {
     pollPause = true;
+    serialConsoleActive = true;
     serialConsoleWindow = new BrowserWindow({
-        width: 600,
+        width: 800,
         height: 500,
         show: false,
         modal: true,
@@ -470,8 +478,11 @@ function serialConsole() {
     }));
 
     serialConsoleWindow.show();
-    statisticsWindow.on('closed', () => {
+    //if (isDev) serialConsoleWindow.webContents.openDevTools();
+
+    serialConsoleWindow.on('closed', () => {
         statisticsWindow = null;
+        serialConsoleActive = false;
         pollPause = false;
         pollPuff();
     });
@@ -578,3 +589,10 @@ function pollStatistics(callback) {
         callback(obj);
     });
 }
+
+
+ipc.on('cmd', (event, data) => {
+    if (port) {
+        port.write(data + '\r\n');
+    }
+});
