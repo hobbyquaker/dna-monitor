@@ -87,6 +87,8 @@ function createWindow () {
                 retainPuffs = data;
             }
             ipcSend('retain', retainPuffs);
+
+            menu.items[2].submenu.items[0].checked = !retainPuffs;
         });
 
         storage.get('datapoints', (err, data) => {

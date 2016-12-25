@@ -35,7 +35,6 @@ let axisNames = {
 
 ipc.on('retain', (event, data) => {
     retainPuffs = data;
-    console.log('retain', data);
 });
 
 ipc.on('sport', (event, data) => {
