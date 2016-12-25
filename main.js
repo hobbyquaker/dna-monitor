@@ -26,6 +26,7 @@ let pc = 50;
 let features;
 let pollPause;
 let serialConsoleActive;
+let retainPuffs;
 
 let pollPuffDatapoints =  ['T', 'P'];
 let pollSettingsDatapoints = ['TSP', 'PSP', 'R', 'B'];
@@ -79,6 +80,14 @@ function createWindow () {
     // let's go!
     setTimeout(() => {
         findport(start);
+
+
+        storage.get('retain', (err, data) => {
+            if (!err) {
+                retainPuffs = data;
+            }
+            ipcSend('retain', retainPuffs);
+        });
 
         storage.get('datapoints', (err, data) => {
             if (!err) {
@@ -374,17 +383,22 @@ var menuTemplate = [
                 click() { serialConsole(); }
             }
         ]
-    }/*,
+    },
     {
         label: 'Settings',
         submenu: [
             {
                 label: 'Clear chart on every puff',
                 type: 'checkbox',
-                checked: true
+                checked: true,
+                click(menuItem) {
+                    retainPuffs = !menuItem.checked;
+                    storage.set('retain', retainPuffs);
+                    ipcSend('retain', retainPuffs);
+                }
             }
         ]
-    }*/
+    }
 
 ];
 if (process.platform === 'darwin') {
@@ -596,3 +610,4 @@ ipc.on('cmd', (event, data) => {
         port.write(data + '\r\n');
     }
 });
+

@@ -6,10 +6,13 @@ require('highcharts/themes/gray.js')(Highcharts);
 let running;
 let degreeunit;
 let start;
+let startDistinct;
 let maxPower;
 let maxTemperature;
 let riseTime;
+let riseTimeDistinct;
 let elapsed;
+let elapsedDistinct;
 
 let visibleAxis = ['P', 'T'];
 
@@ -21,6 +24,7 @@ let degreeVal;
 let degreeChange;
 let series;
 let chart;
+let retainPuffs;
 
 let axisNames = {
     'Current': 'I',
@@ -29,7 +33,12 @@ let axisNames = {
     'Battery': 'B'
 };
 
-ipc.on('sport', function (event, data) {
+ipc.on('retain', (event, data) => {
+    retainPuffs = data;
+    console.log('retain', data);
+});
+
+ipc.on('sport', (event, data) => {
     if (data) {
         $('#error').hide();
     } else {
@@ -48,14 +57,30 @@ ipc.on('infos', (event, data) => {
     $('#infos').html((data.MFR !== '?' ? data.MFR + ' ' : '') + data.PRODUCT + ', ' + data.CELLS + ' battery cell' + (data.CELLS > 1 ? 's' : '') + ', ' + data.FEATURES.join(', '));
 });
 
+function clearChart() {
+    chart.series.forEach(series => {
+        series.setData([]);
+    });
+    chart.redraw();
+    start = (new Date()).getTime();
+    startDistinct = start;
+}
+
 ipc.on('values', (event, data) => {
     if (data.P.match(/W/)) {
         if (!running) {
-            chart.series.forEach(series => {
-                series.setData([]);
-            });
-            chart.redraw();
-            start = (new Date()).getTime();
+            if (!retainPuffs) {
+                clearChart();
+            } else {
+                if (!start) {
+                    start = (new Date()).getTime();
+                    startDistinct = start;
+                } else {
+                    start = (new Date()).getTime() - (elapsed * 1000);
+                    startDistinct = (new Date()).getTime();
+                }
+
+            }
             running = true;
             setpChange = false;
             settChange = false;
@@ -96,32 +121,34 @@ ipc.on('values', (event, data) => {
         let t = parseFloat(data.T);
         let p = parseFloat(data.P);
         elapsed = ((new Date()).getTime() - start) / 1000;
-        chart.series[0].addPoint([elapsed, t], true, false, false);
-        chart.series[1].addPoint([elapsed, p], true, false, false);
+        elapsedDistinct = ((new Date()).getTime() - startDistinct) / 1000;
+        let fifo = retainPuffs && (chart.series[0].data.length > 500);
+        chart.series[0].addPoint([elapsed, t], true, fifo, false);
+        chart.series[1].addPoint([elapsed, p], true, fifo, false);
         if (visibleAxis.indexOf('V') !== -1) {
             let v = parseFloat(data.V);
-            chart.series[2].addPoint([elapsed, v], true, false, false);
+            chart.series[2].addPoint([elapsed, v], true, fifo, false);
         }
         if (visibleAxis.indexOf('B') !== -1) {
             let b = parseFloat(data.B);
-            chart.series[3].addPoint([elapsed, b], true, false, false);
+            chart.series[3].addPoint([elapsed, b], true, fifo, false);
         }
         if (visibleAxis.indexOf('I') !== -1) {
             let i = parseFloat(data.I);
-            chart.series[4].addPoint([elapsed, i], true, false, false);
+            chart.series[4].addPoint([elapsed, i], true, fifo, false);
         }
         if (visibleAxis.indexOf('RLIVE') !== -1) {
             let r = parseFloat(data.R);
-            chart.series[5].addPoint([elapsed, r], true, false, false);
+            chart.series[5].addPoint([elapsed, r], true, fifo, false);
         }
         if (t > maxTemperature) maxTemperature = t;
         if (p > maxPower) maxPower = p;
         if (riseTime === 0 && $('#tsp').val() > 0 && t > $('#tsp').val()) {
-            riseTime = elapsed;
+            riseTime = elapsedDistinct;
         }
     } else {
         if (running) {
-            $('#elapsed').html(elapsed + ' s');
+            $('#elapsed').html(elapsedDistinct + ' s');
             $('#maxPower').html(maxPower + ' W');
             $('#maxTemperature').html(maxTemperature + '°' + $('#degreeunit').val());
             $('#riseTime').html(riseTime + ' s');
@@ -244,7 +271,6 @@ $(document).ready(() => {
         },
         title: {text: ''},
         xAxis: {
-            min: 0
         },
         yAxis: [
             { // 0 Temperature
