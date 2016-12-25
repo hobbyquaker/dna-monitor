@@ -461,8 +461,10 @@ $(document).ready(() => {
         chart.series.forEach(serie => {
             if (data.indexOf(axisNames[serie.name]) !== -1) {
                 serie.show();
+
             }
         });
+        visibleAxis = data;
     });
 
 
