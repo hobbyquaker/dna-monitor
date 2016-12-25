@@ -151,6 +151,13 @@ function start(sport) {
 
     port = new SerialPort(sport);
 
+    port.on('error', (err) => {
+        debug(err.message);
+        //port = null;
+        callbacks = {};
+        app.quit();
+    });
+
     port.on('open', () => {
         debug('opened', sport);
         mainWindow.webContents.send('sport', true);
