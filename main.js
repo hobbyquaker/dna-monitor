@@ -173,6 +173,7 @@ function start(sport) {
     port.on('disconnect', () => {
         debug('disconnect', sport);
         menu.items[1].submenu.items[0].enabled = false;
+        menu.items[1].submenu.items[1].enabled = false;
         menu.items[1].submenu.items[2].enabled = false;
         port = null;
         callbacks = {};
