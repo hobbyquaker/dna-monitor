@@ -203,7 +203,12 @@ function start(sport) {
         debug(err.message);
         //port = null;
         callbacks = {};
-        app.quit();
+        dialog.showMessageBox({
+            type: 'error',
+            message: err.message
+        }, () => {
+            app.quit();
+        });
     });
 
     port.on('open', () => {
