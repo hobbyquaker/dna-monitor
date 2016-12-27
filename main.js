@@ -236,7 +236,7 @@ function createWindow () {
         });
 
         storage.get('datapoints', (err, data) => {
-            if (!err) {
+            if (!err && data && data.length) {
                 pollPuffDatapoints = data;
                 ipcSend('series', data);
             }
