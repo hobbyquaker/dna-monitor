@@ -13,7 +13,11 @@
     "device",
     "monitor"
   ],
-  "author": "GitHub",
+  "author": {
+    "name": "Sebastian Raff",
+    "email": "bastiraff@googlemail.com",
+    "url": "https://github.com/hobbyquaker"
+  },
   "license": "MIT",
   "devDependencies": {
     "electron": "^1.4.1",
