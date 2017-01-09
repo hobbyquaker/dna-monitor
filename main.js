@@ -268,8 +268,15 @@ app.on('activate', () => {
 function findport(cb) {
     let devs = (fs.readdirSync('/dev'));
     let sport;
+    let rx;
+    if (process.platform === 'darwin') {
+	rx = /tty\.usbmodem[0-9A-Z]+/;
+    } else {
+        rx = /ttyACM[0-9]+/;
+    } 
+
     for (let i = 0; i < devs.length; i++) {
-        if (devs[i].match(/tty\.usbmodem[0-9A-Z]+/)) {
+        if (devs[i].match(rx)) {
             sport = '/dev/' + devs[i];
             break;
         }
