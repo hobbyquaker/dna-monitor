@@ -4,9 +4,6 @@
   "private": true,
   "description": "A simple macOS device monitoring tool for e-cigarettes with Evolv DNA chipset",
   "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
   "repository": "https://github.com/hobbyquaker/electron-quick-start",
   "keywords": [
     "vape",
@@ -20,7 +17,9 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^1.4.1",
-    "electron-packager": "^8.4.0"
+    "electron-builder": "^11.2.3",
+    "electron-packager": "^8.4.0",
+    "electron-rebuild": "^1.5.6"
   },
   "dependencies": {
     "async": "^2.1.4",
@@ -31,5 +30,18 @@
     "jquery": "^3.1.1",
     "photonkit": "^0.1.2",
     "serialport": "^4.0.7"
+  },
+  "scripts": {
+    "start": "electron .",
+    "pack": "build --dir",
+    "dist": "build"
+  },
+  "build": {
+    "mac": {
+      "target": ["dmg"]
+    },
+    "linux": {
+      "target": ["deb", "pacman"]
+    }
   }
 }
