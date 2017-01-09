@@ -4,7 +4,7 @@
   "private": true,
   "description": "A simple macOS device monitoring tool for e-cigarettes with Evolv DNA chipset",
   "main": "main.js",
-  "repository": "https://github.com/hobbyquaker/electron-quick-start",
+  "repository": "https://github.com/hobbyquaker/dna-monitor",
   "keywords": [
     "vape",
     "e-cigarette",
