@@ -1,6 +1,6 @@
 # dna-monitor
 
-[![Dependency Status](https://david-dm.org/hobbyquaker/dna-monitor)](https://david-dm.org/hobbyquaker/dna-monitor)
+[![Dependency Status](https://david-dm.org/hobbyquaker/dna-monitor/status.svg)](https://david-dm.org/hobbyquaker/dna-monitor)
 [![devDependency Status](https://david-dm.org/hobbyquaker/dna-monitor/dev-status.svg)](https://david-dm.org/hobbyquaker/dna-monitor?type=dev)
 
 > A simple macOS device monitoring tool for e-cigarettes with Evolv DNA chipset 
