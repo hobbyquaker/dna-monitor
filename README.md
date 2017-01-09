@@ -3,7 +3,7 @@
 [![Dependency Status](https://david-dm.org/hobbyquaker/dna-monitor/status.svg)](https://david-dm.org/hobbyquaker/dna-monitor)
 [![devDependency Status](https://david-dm.org/hobbyquaker/dna-monitor/dev-status.svg)](https://david-dm.org/hobbyquaker/dna-monitor?type=dev)
 
-> A simple macOS device monitoring tool for e-cigarettes with Evolv DNA chipset 
+> A simple device monitoring tool for e-cigarettes with Evolv DNA chipset
 
 ![Screenshot](screenshot.png "Screenshot")
 
@@ -13,12 +13,17 @@ This tool can't - and will never - replace the Escribe software, it's just the d
 
 ### Download
 
-[dna-monitor.zip](https://github.com/hobbyquaker/dna-monitor/releases/latest)
+Go to the [latest release page](https://github.com/hobbyquaker/dna-monitor/releases/latest) and download the .zip file.
 
 
 ### Usage
 
 Connect your DNA Device to your Mac, start the Application, vape on.
+
+
+### Contributing
+
+Clone the repo, do `npm install` in the project root. Use `./node_modules/.bin/electron .` for testing.
 
 
 ### Serial commands
