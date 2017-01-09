@@ -13,7 +13,7 @@ This tool can't - and will never - replace the Escribe software, it's just the d
 
 ### Download
 
-Go to the [latest release page](https://github.com/hobbyquaker/dna-monitor/releases/latest) and download the .zip file.
+Go to the [latest release page](https://github.com/hobbyquaker/dna-monitor/releases/latest) and download the dna-monitor-vX.X.X.zip file.
 
 
 ### Usage
