@@ -157,7 +157,8 @@ if (process.platform === 'darwin') {
                 type: 'separator'
             },
             {
-                role: 'hide'
+                role: 'hide',
+                label: 'Hide DNA Monitor'
             },
             {
                 role: 'hideothers'
@@ -169,7 +170,8 @@ if (process.platform === 'darwin') {
                 type: 'separator'
             },
             {
-                role: 'quit'
+                role: 'quit',
+                label: 'Quit DNA Monitor'
             }
         ]
     });
