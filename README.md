@@ -36,7 +36,7 @@ Connect your DNA Device, start the Application, vape on.
 ### Contributing
 
 Clone the repo, do `npm install` in the project root. Use `npm start` to start the application in debug mode.
-Depending on your installed Nodejs version it might be neccessary to rebuild the serialport module:
+Depending on your installed Nodejs version it might be necessary to rebuild the serialport module:
 `./node_modules/.bin/electron-rebuild serialport`
 
 
@@ -48,7 +48,7 @@ helpful: https://github.com/hobbyquaker/dna-commands
 
 ### Credits
 
-This software uses [Highcharts](http://www.highcharts.com/) which is free only for non-commercial use.
+This software uses [Highcharts](http://www.highcharts.com/) which is free __only for non-commercial use__.
 
 
 ### License
