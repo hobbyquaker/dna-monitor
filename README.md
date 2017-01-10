@@ -30,7 +30,7 @@ Don't forget to give you user access to the serial port, on Ubuntu this can be d
 
 ### Usage
 
-Connect your DNA Device to your Mac, start the Application, vape on.
+Connect your DNA Device, start the Application, vape on.
 
 
 ### Contributing
