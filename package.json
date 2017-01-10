@@ -42,7 +42,7 @@
   },
   "build": {
     "mac": {
-      "target": ["dmg", "zip"]
+      "target": ["dmg"]
     },
     "linux": {
       "target": ["deb", "pacman", "tar.gz"]
