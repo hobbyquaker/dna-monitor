@@ -557,8 +557,10 @@ function exportCsv() {
         ]
     }, function (filename) {
         debug('export', filename);
-        csvFile = filename;
-        ipcSend('csv');
+        if (filename) {
+            csvFile = filename;
+            ipcSend('csv');
+        }
     });
 }
 
