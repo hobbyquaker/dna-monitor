@@ -41,6 +41,7 @@
     "dist": "build"
   },
   "build": {
+    "productName": "DNA Monitor",
     "mac": {
       "target": ["dmg"]
     },
