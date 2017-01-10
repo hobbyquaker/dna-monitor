@@ -13,7 +13,7 @@
 This tool can't - and will never - replace the Escribe software, it's just the device-monitoring part. For configuration of preheat, profiles, wires, themes etc you still need Escribe.
 
 
-### Download & Install
+### Download
 
 #### macOS
 
