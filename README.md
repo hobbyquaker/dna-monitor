@@ -36,6 +36,8 @@ Connect your DNA Device, start the Application, vape on.
 ### Contributing
 
 Clone the repo, do `npm install` in the project root. Use `npm start` to start the application in debug mode.
+Depending on your installed Nodejs version it might be neccessary to rebuild the serialport module:
+`./node_modules/.bin/electron-rebuild serialport`
 
 
 ### Serial commands
