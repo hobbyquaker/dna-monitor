@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.org/hobbyquaker/dna-monitor.svg?branch=master)](https://travis-ci.org/hobbyquaker/dna-monitor)
 
 
-> A simple device monitoring tool for e-cigarettes with Evolv DNA chipset
+> A simple device monitoring tool for e-cigarettes with Evolv DNA chipset. Works with macOS and Linux.
 
 ![Screenshot](screenshot.png "Screenshot")
 
@@ -13,9 +13,19 @@
 This tool can't - and will never - replace the Escribe software, it's just the device-monitoring part. For configuration of preheat, profiles, wires, themes etc you still need Escribe.
 
 
-### Download
+### Download & Install
 
-Go to the [latest release page](https://github.com/hobbyquaker/dna-monitor/releases/latest) and download the dna-monitor-vX.X.X.zip file.
+#### macOS
+
+Go to the [latest release page](https://github.com/hobbyquaker/dna-monitor/releases/latest) and download the dna-monitor-X.X.X.dmg file.
+
+#### Linux
+
+On the [latest release page](https://github.com/hobbyquaker/dna-monitor/releases/latest) you can find a .deb file for 
+Ubuntu and Debian, a .pacman file for Arch and a .tar.gz that should work on other distributions.
+
+Don't forget to give you user access to the serial port, on Ubuntu this can be done by adding your user to the dialout group:
+`sudo usermod -a -G dialout <username>` 
 
 
 ### Usage
@@ -25,7 +35,7 @@ Connect your DNA Device to your Mac, start the Application, vape on.
 
 ### Contributing
 
-Clone the repo, do `npm install` in the project root. Use `./node_modules/.bin/electron .` for testing.
+Clone the repo, do `npm install` in the project root. Use `npm start` to start the application in debug mode.
 
 
 ### Serial commands
