@@ -45,7 +45,7 @@
       "target": ["dmg", "zip"]
     },
     "linux": {
-      "target": ["deb", "pacman", "tar.gz"]
+      "target": ["snap", "deb", "pacman", "tar.gz"]
     }
   }
 }
