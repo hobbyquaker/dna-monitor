@@ -22,7 +22,7 @@ Go to the [latest release page](https://github.com/hobbyquaker/dna-monitor/relea
 #### Linux
 
 On the [latest release page](https://github.com/hobbyquaker/dna-monitor/releases/latest) you can find a .deb file for 
-Ubuntu and Debian, a .pacman file for Arch and a .tar.gz that should work on other distributions.
+Ubuntu and Debian and a .tar.gz that should work on other distributions.
 
 Don't forget to give you user access to the serial port, on Ubuntu this can be done by adding your user to the dialout group:
 `sudo usermod -a -G dialout <username>` 

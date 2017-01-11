@@ -22,13 +22,12 @@
   "devDependencies": {
     "electron": "^1.4.1",
     "electron-builder": "^11.2.3",
-    "electron-packager": "^8.4.0",
     "electron-rebuild": "^1.5.6"
   },
   "dependencies": {
     "async": "^2.1.4",
     "electron-is-dev": "^0.1.2",
-    "electron-json-storage": "^2.1.0",
+    "electron-json-storage": "^3.0.0",
     "electron-window-state": "^4.0.1",
     "highcharts": "^5.0.6",
     "jquery": "^3.1.1",
@@ -46,7 +45,7 @@
       "target": ["dmg"]
     },
     "linux": {
-      "target": ["deb", "pacman", "tar.gz"]
+      "target": ["deb", "tar.gz"]
     }
   }
 }
