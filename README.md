@@ -6,12 +6,14 @@
 
 
 
-> A simple device monitoring tool for e-cigarettes with Evolv DNA chipset. Works with macOS and Linux.
+> A simple device monitoring tool for e-cigarettes with Evolv DNA chipset. Works with macOS and Linux. 
 
 ![Screenshot](screenshot.png "Screenshot")
 
 
 This tool can't - and will never - replace the Escribe software, it's just the device-monitoring part. For configuration of preheat, profiles, wires, themes etc you still need Escribe.
+
+Tested with DNA75 and DNA200 Chipset. Users reported that this does _not_ work with the DNA250 chipset :(
 
 
 ### Download
