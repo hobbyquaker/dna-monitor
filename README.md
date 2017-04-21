@@ -3,6 +3,7 @@
 [![Dependency Status](https://david-dm.org/hobbyquaker/dna-monitor/status.svg)](https://david-dm.org/hobbyquaker/dna-monitor)
 [![devDependency Status](https://david-dm.org/hobbyquaker/dna-monitor/dev-status.svg)](https://david-dm.org/hobbyquaker/dna-monitor?type=dev)
 [![Build Status](https://travis-ci.org/hobbyquaker/dna-monitor.svg?branch=master)](https://travis-ci.org/hobbyquaker/dna-monitor)
+[![Github All Releases](https://img.shields.io/github/downloads/hobbyquaker/dna-monitor/total.svg)]()
 
 ![](icon.png =128x128)
 
