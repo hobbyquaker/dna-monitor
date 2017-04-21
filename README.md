@@ -1,18 +1,21 @@
 # dna-monitor
+<img src="icon.png" width=128>
 
 [![Dependency Status](https://david-dm.org/hobbyquaker/dna-monitor/status.svg)](https://david-dm.org/hobbyquaker/dna-monitor)
 [![devDependency Status](https://david-dm.org/hobbyquaker/dna-monitor/dev-status.svg)](https://david-dm.org/hobbyquaker/dna-monitor?type=dev)
 [![Build Status](https://travis-ci.org/hobbyquaker/dna-monitor.svg?branch=master)](https://travis-ci.org/hobbyquaker/dna-monitor)
 [![Github All Releases](https://img.shields.io/github/downloads/hobbyquaker/dna-monitor/total.svg)]()
 
-![](icon.png =128x128)
 
-> A simple device monitoring tool for e-cigarettes with Evolv DNA chipset. Works with macOS and Linux.
+
+> A simple device monitoring tool for e-cigarettes with Evolv DNA chipset. Works with macOS and Linux. 
 
 ![Screenshot](screenshot.png "Screenshot")
 
 
 This tool can't - and will never - replace the Escribe software, it's just the device-monitoring part. For configuration of preheat, profiles, wires, themes etc you still need Escribe.
+
+Tested with DNA75 and DNA200 Chipset. Users reported that this does _not_ work with the DNA250 chipset :(
 
 
 ### Download
